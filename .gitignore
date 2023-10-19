@@ -1,0 +1,24 @@
+# Logs
+ecoders-frontend/logs
+ecoders-frontend/*.log
+ecoders-frontend/npm-debug.log*
+ecoders-frontend/yarn-debug.log*
+ecoders-frontend/yarn-error.log*
+ecoders-frontend/pnpm-debug.log*
+ecoders-frontend/lerna-debug.log*
+
+ecoders-frontend/node_modules
+ecoders-frontend/dist
+ecoders-frontend/dist-ssr
+ecoders-frontend/*.local
+
+# Editor directories and files
+ecoders-frontend/.vscode/*
+!ecoders-frontend/.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
