@@ -1,3 +1,4 @@
+
 # Logs
 ecoders-frontend/logs
 ecoders-frontend/*.log
@@ -22,3 +23,21 @@ ecoders-frontend/.vscode/*
 *.njsproj
 *.sln
 *.sw?
+
+ecoders-backend/HELP.md
+ecoders-backend/.gradle
+ecoders-backend/build/
+!ecoders-backend/gradle/wrapper/gradle-wrapper.jar
+!ecoders-backend/**/src/main/**/build/
+!ecoders-backend/**/src/test/**/build/
+ecoders-backend/Dockerfile
+
+### IntelliJ IDEA ###
+.idea
+ecoders-backend/.idea
+*.iws
+*.iml
+*.ipr
+ecoders-backend/out/
+!ecoders-backend/**/src/main/**/out/
+!ecoders-backend/**/src/test/**/out/
