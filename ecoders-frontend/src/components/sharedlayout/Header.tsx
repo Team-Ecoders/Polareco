@@ -4,8 +4,13 @@ import { useState } from 'react';
 import { TfiMenu } from 'react-icons/tfi';
 // import { useNavigate } from 'react-router-dom';
 
+import profileImage from '../../assets/ProfileImage.svg';
+
 function Header() {
-  const [loginStates, setLoginStates] = useState(false);
+  //반응형 css 제작을 위한 상태 값
+  // const [loginStates, setLoginStates] = useState(false);
+  const [loginStates, setLoginStates] = useState(true);
+
   const [ishambergerClicked, setIsHambergerClicked] = useState(false);
   // const navigate = useNavigate();
 
@@ -43,9 +48,9 @@ function Header() {
           <HeaderUserContainer>
             {loginStates ? (
               <>
-                {/* <HeaderProfilePic src={profileImg} onClick={navigateToMyInfo} />
-              <UsernameButton onClick={navigateToMyInfo}>{username}</UsernameButton>
-              <LogoutButton onClick={handleLogout}>Logout</LogoutButton> */}
+                <HeaderProfilePic src={profileImage} />
+                <UsernameButton>User Name</UsernameButton>
+                <LogoutButton>Logout</LogoutButton>
               </>
             ) : (
               <>
@@ -216,6 +221,9 @@ const Nav = styled.div`
 `;
 const HeaderUserContainer = styled.div`
   display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
 `;
 
 const ButtonStyle = styled.button`
@@ -284,12 +292,22 @@ const ButtonStyle = styled.button`
 `;
 
 const UsernameButton = styled(ButtonStyle)`
-  font-size: 20px;
   background-color: #ffffff;
   border: 1px solid #1a1a1a;
   color: #1a1a1a;
   margin-left: 10px;
   margin-right: 10px;
+  height: 80%;
+
+  @media (max-width: 768px) {
+    // 화면 크기가 768px 이하일 때 ipad 가로
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    // 화면 크기가 480px 이하일 때 moble
+    display: none;
+  }
 `;
 
 const LogoutButton = styled(ButtonStyle)`
@@ -361,5 +379,27 @@ const HeaderHambergerMenuContainer = styled.div`
       font-weight: bold;
       border-bottom: 1px solid #000;
     }
+  }
+`;
+
+//로그인 후 유저 프로필
+const HeaderProfilePic = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid #d9d9d9;
+  cursor: pointer;
+
+  @media (max-width: 768px) {
+    // 화면 크기가 768px 이하일 때 ipad 가로
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+  }
+
+  @media (max-width: 480px) {
+    margin-right: 5px;
+    width: 35px;
+    height: 35px;
   }
 `;
