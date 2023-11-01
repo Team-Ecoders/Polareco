@@ -96,7 +96,7 @@ export default Header;
 const Entire = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 90px;
 `;
 
 const HeaderContainer = styled.div`

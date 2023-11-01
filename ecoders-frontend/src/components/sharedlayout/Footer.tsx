@@ -73,7 +73,7 @@ const Entire = styled.div`
   align-items: center;
   z-index: 40;
   background-color: #131313;
-  margin-top: 80px;
+  margin-top: 10px;
 `;
 
 const FooterLogo = styled.img`
