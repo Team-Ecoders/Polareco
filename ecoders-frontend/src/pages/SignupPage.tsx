@@ -253,15 +253,12 @@ function Signup() {
                     </div>
                   </div>
                 </SignUpModal>
+                <SubmitButtonGoogle className="google-login-submit">
+                  <GoogleLogo src={googleicon} />
+                  Sign up with google
+                </SubmitButtonGoogle>
               </ButtonWrapper>
             </SignUpForm>
-            <ButtonWrapper>
-              {/* 구글 소셜 서버에서 진행 -> 폼에서 넣지 말고 클릭시 요청 로직 */}
-              <SubmitButtonGoogle className="google-login-submit">
-                <GoogleLogo src={googleicon} />
-                Sign up with google
-              </SubmitButtonGoogle>
-            </ButtonWrapper>
           </FormContainer>
           <IsUser onClick={linkToLoginPageHandler}>계정이 이미 있으신가요?</IsUser>
         </EleWrapper>
