@@ -15,6 +15,7 @@ interface ButtonType {
   children?: any;
   weight?: string;
   className?: string;
+  type?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
