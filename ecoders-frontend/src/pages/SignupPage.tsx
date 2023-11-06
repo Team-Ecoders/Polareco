@@ -71,7 +71,7 @@ function Signup() {
     }
 
     // 이메일이 형식에 맞지 않을 때
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]$/;
 
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = '올바른 이메일 형식이 아닙니다.';
@@ -184,22 +184,30 @@ function Signup() {
                     console.log('서버에 이메일 인증 메일 전송 요청');
                     //3분 타이머
                   }}>
-                  이메일
-                  <br />
-                  인증하기
+                  인증메일 발송
                 </EmailCertifyButton>
               </EmailInputContainer>
               {errors.email && <ErrorText>{errors.email}</ErrorText>}
 
               {/* 이메일 확인 인풋 */}
-              <Input
-                className="email-input"
-                placeholder="인증코드"
-                type="text"
-                name="confirmEmail"
-                value={formData.confirmEmail}
-                onChange={changeHandler}
-              />
+              <EmailInputContainer>
+                <Input
+                  className="email-input"
+                  placeholder="인증코드"
+                  type="text"
+                  name="confirmEmail"
+                  value={formData.confirmEmail}
+                  onChange={changeHandler}
+                />
+                <EmailCertifyButton
+                  type="button"
+                  onClick={() => {
+                    console.log('서버에 이메일 인증 메일 전송 요청');
+                    //3분 타이머
+                  }}>
+                  인증하기
+                </EmailCertifyButton>
+              </EmailInputContainer>
               {errors.confirmEmail ? (
                 <ErrorText>{errors.confirmEmail}</ErrorText>
               ) : (
@@ -214,6 +222,7 @@ function Signup() {
                 value={formData.password}
                 onChange={changeHandler}
               />
+
               {errors.password ? (
                 <ErrorText>{errors.password}</ErrorText>
               ) : (
@@ -402,7 +411,8 @@ const SignUpModal = styled(Modal)`
 
 const EmailCertifyButton = styled(Button)`
   padding: 3px;
-  width: 30%;
+  width: 60%;
+  height: 35px;
   font-size: small;
   font-weight: normal;
   background-color: #7092bfe4;
