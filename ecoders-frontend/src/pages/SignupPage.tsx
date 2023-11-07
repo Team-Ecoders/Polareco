@@ -5,7 +5,7 @@ import Input from '../components/atoms/Input';
 import Button from '../components/atoms/Button';
 import Modal from '../components/atoms/Modal';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { closeModal, openModal } from '../redux/slice/modalSlice';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -24,6 +24,16 @@ interface ErrorObject {
 function Signup() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // 이메일이 형식에 맞지 않을 때
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+  // 닉네임이 형식에 맞지 않을 때
+  const usernameRegex = /^[a-zA-Z\dㄱ-ㅎ가-힣]{2,10}$/;
+
+  // 비밀번호가 형식에 맞지 않을 때
+  const passwordRegex =
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[`~!@#$%^&*()\-_=+\[\]{}\\|;:'\",.<>\/?])[a-zA-Z\d`~!@#$%^&*()\-_=+\[\]{}\\|;:'\",.<>\/?]{8,20}$/;
 
   // input 상태
   const [formData, setFormData] = useState({
@@ -54,7 +64,7 @@ function Signup() {
   const [isRunning, setIsRunning] = useState(false);
 
   //sign up 버튼 활성화 상태
-  const [isSubmitButton, setIsSubmitButton] = useState(false);
+  const [isSubmitButtonDisabled, setIsSubmitDisabledButton] = useState(true);
 
   //이메일 인증 메일이 발송되면 유효 시간 카운트
   useEffect(() => {
@@ -71,26 +81,20 @@ function Signup() {
     };
   }, [timeLeft, isRunning]);
 
-  //sign up 버튼 활성화 유무 -> 잠시만 이따가..보고..
+  //sign up 버튼 활성화 확인
   useEffect(() => {
     // 오류가 없다면(newErrors에 true, truthy한 값이 있는지 검사 -> 즉 오류가 있는지 검사)
     // error모든 값이 false라면 treu를 리턴함 -> 유효성 검사 통과
     if (Object.values(errors).every(error => !error)) {
-      setIsSubmitButton(!isSubmitButton);
+      setIsSubmitDisabledButton(false);
+    } else {
+      if (emailConfirm.emailConfirmed) {
+        setIsSubmitDisabledButton(false);
+      } else {
+        setIsSubmitDisabledButton(true);
+      }
     }
-  }, [formData, errors]);
-
-  // 이메일이 형식에 맞지 않을 때
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]$/;
-
-  // 닉네임이 형식에 맞지 않을 때
-  // /^(?!.*\s)(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{4,20}$/;
-  const usernameRegex = /^[a-zA-Z\dㄱ-ㅎ가-힣]{2,10}$/;
-
-  // 비밀번호가 형식에 맞지 않을 때
-  // /^(?![0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+`])[A-Za-z0-9!@#$%^&*()_+`]{8,20}$/;
-  const passwordRegex =
-    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[`~!@#$%^&*()\-_=+\[\]{}\\|;:'\",.<>\/?])[a-zA-Z\d`~!@#$%^&*()\-_=+\[\]{}\\|;:'\",.<>\/?]{8,20}$/;
+  }, [errors, emailConfirm]);
 
   // 유효성 검사 함수
   const validateForm = (): boolean => {
@@ -132,8 +136,8 @@ function Signup() {
         ? '닉네임을 입력하세요.'
         : !usernameRegex.test(formData.username)
         ? '닉네임 형식이 맞지 않습니다.'
-        : formData.username.length < 4
-        ? '닉네임은 4자 이상이어야 합니다.'
+        : formData.username.length < 2
+        ? '닉네임은 2자 이상이어야 합니다.'
         : formData.username.length > 20
         ? '닉네임은 20자 이하로 설정하세요.'
         : undefined;
@@ -169,16 +173,9 @@ function Signup() {
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     let { name, value } = e.target;
 
-    //비밀번호에 공백 입력할 수 없음
-    if (name == 'password' || name == 'confirmPassword') {
+    //비밀번호, 유저네임 공백 입력할 수 없음
+    if (name == 'password' || name == 'confirmPassword' || name == 'username') {
       value = value.replace(/\s/g, '');
-    }
-
-    //유저네임 입력시 공백으로 시작할 수 없음
-    if (name == 'username') {
-      if (value.startsWith(' ')) {
-        value = value.trim();
-      }
     }
 
     setFormData({
@@ -189,10 +186,12 @@ function Signup() {
 
   // email 인증 메일 전송 함수
   const onClickSandingEmail = async () => {
+    setErrors({ ...errors, email: null });
     if (!formData.email) {
       setErrors({ ...errors, email: '이메일을 입력하세요' });
       return;
     } else if (formData.email && !emailRegex.test(formData.email)) {
+      console.log(formData.email);
       setErrors({ ...errors, email: '올바른 이메일 형식이 아닙니다.' });
       return;
     } else {
@@ -200,16 +199,11 @@ function Signup() {
         email: formData.email,
       };
       try {
-        const response = await axios.post(`${APIURL}/auth/sandemail`, data, {
+        const response = await axios.post(`${APIURL}/signup/code/issue`, data, {
           headers: {
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.status === 403) {
-          setErrors({ ...errors, email: '이미 존재하는 이메일입니다.' });
-          return;
-        }
         if (response.status === 200) {
           //인증메일 발송 완료-> 완료 모달
           dispatch(openModal('sendingMailModal'));
@@ -222,7 +216,9 @@ function Signup() {
           setIsRunning(true);
         }
       } catch (err: any) {
-        console.log(err);
+        if (err.response.status === 403) {
+          setErrors({ ...errors, email: '이미 존재하는 이메일입니다.' });
+        }
       }
     }
   };
@@ -238,14 +234,19 @@ function Signup() {
         confirmEmail: formData.confirmEmail,
       };
       try {
-        const response = await axios.post(`${APIURL}/auth/confirmemail`, data, {
+        const response = await axios.get(`${APIURL}/signup/code/verification`, {
+          params: data,
           headers: {
             'Content-Type': 'application/json',
           },
         });
 
-        if (response.status === 400) {
+        if (response.status === 401) {
           setErrors({ ...errors, confirmEmail: '유효하지 않은 코드입니다.' });
+          return;
+        }
+        if (response.status === 404) {
+          setErrors({ ...errors, confirmEmail: '인증 코드를 입력해주세요.' });
           return;
         }
         if (response.status === 200) {
@@ -253,6 +254,9 @@ function Signup() {
           setEmailConfirm({ ...emailConfirm, emailConfirmed: true });
           //인증 코드 타이머 비활성화
           setIsRunning(false);
+
+          //남은 시간 0초..
+          setTimeLeft(0);
         }
       } catch (err: any) {
         console.log(err);
@@ -270,7 +274,24 @@ function Signup() {
     if (!isValid) {
       return;
     } else {
-      dispatch(openModal('signupModal'));
+      try {
+        const postFormData = {
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        };
+
+        const response = await axios.post(`${APIURL}/signup`, postFormData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.status == 200) {
+          dispatch(openModal('signupModal'));
+        }
+      } catch (err: any) {
+        console.log(err);
+      }
     }
   };
 
@@ -282,6 +303,7 @@ function Signup() {
           <Title>SIGN UP</Title>
           <FormContainer>
             <SignUpForm onSubmit={onSubmitHandler} noValidate>
+              {/* 이메일 입력 input */}
               <EmailInputContainer>
                 <Input
                   className="email-input"
@@ -290,16 +312,13 @@ function Signup() {
                   name="email"
                   value={formData.email}
                   onChange={changeHandler}
-                  disabled={emailConfirm.emailSanding && timeLeft >= 0}
+                  disabled={(emailConfirm.emailSanding && timeLeft > 0) || emailConfirm.emailConfirmed}
                 />
                 {/* 인증메일 발송 버튼 */}
                 <EmailCertifyButton
                   type="button"
-                  onClick={() => {
-                    console.log('서버에 이메일 인증 메일 전송 요청');
-                    //3분 타이머
-                  }}
-                  disabled={emailConfirm.emailSanding && timeLeft >= 0}>
+                  onClick={onClickSandingEmail}
+                  disabled={(emailConfirm.emailSanding && timeLeft > 0) || emailConfirm.emailConfirmed}>
                   인증 메일 발송
                 </EmailCertifyButton>
               </EmailInputContainer>
@@ -310,7 +329,7 @@ function Signup() {
                 </div>
               </ConfirmEmailModal>
 
-              {/* 이메일 확인 인풋 */}
+              {/* 이메일 인증 코드 input */}
               {emailConfirm.emailSanding && (
                 <>
                   <EmailInputContainer>
@@ -325,10 +344,7 @@ function Signup() {
                     />
                     <EmailCertifyButton
                       type="button"
-                      onClick={() => {
-                        console.log('서버에 이메일 인증 메일 전송 요청');
-                        //3분 타이머
-                      }}
+                      onClick={onClickConfirmEmail}
                       disabled={emailConfirm.emailConfirmed}>
                       이메일 인증하기
                     </EmailCertifyButton>
@@ -345,6 +361,7 @@ function Signup() {
                 </>
               )}
 
+              {/* 비밀번호 입력 input */}
               <Input
                 className="password-input"
                 placeholder="비밀번호"
@@ -373,6 +390,7 @@ function Signup() {
                 <Info>비밀번호는 영문/숫자/특수문자를 반드시 포함한 8자 이상이어야 합니다.</Info>
               )}
 
+              {/* 비밀번호 확인 input */}
               <Input
                 className="password-check-input"
                 placeholder="비밀번호 확인"
@@ -392,6 +410,7 @@ function Signup() {
               />
               {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
 
+              {/* 닉네임 input */}
               <Input
                 className="username-input"
                 placeholder="닉네임"
@@ -406,8 +425,8 @@ function Signup() {
                   } else {
                     usernameError = !usernameRegex.test(formData.username)
                       ? '닉네임 형식이 맞지 않습니다.'
-                      : formData.username.length < 4
-                      ? '닉네임은 4자 이상이어야 합니다.'
+                      : formData.username.length < 2
+                      ? '닉네임은 2자 이상이어야 합니다.'
                       : formData.username.length > 20
                       ? '닉네임은 20자 이하로 설정하세요.'
                       : undefined;
@@ -421,8 +440,21 @@ function Signup() {
                 <Info>닉네임은 공백을 포함할 수 없으며, 한글/영문/숫자 포함 4자 이상 20자 이하여야 합니다.</Info>
               )}
 
+              {/* 가입버튼 */}
               <ButtonWrapper>
-                <SubmitButton className="sign-up-submit" disabled={isSubmitButton}>
+                <SubmitButton
+                  className="sign-up-submit"
+                  disabled={
+                    //오류도 없고, 이메일 인증도 했고, formData값들이 모두 있는 상태(false가 아닌 상태) => false
+                    !(
+                      Object.values(errors).every(error => !error) &&
+                      emailConfirm.emailConfirmed &&
+                      formData.email &&
+                      formData.password &&
+                      formData.confirmPassword &&
+                      formData.username
+                    )
+                  }>
                   Sign up
                 </SubmitButton>
                 <SignUpModal modaltype="signupModal">
