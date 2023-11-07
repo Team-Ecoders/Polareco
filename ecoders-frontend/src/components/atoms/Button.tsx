@@ -16,6 +16,7 @@ interface ButtonType {
   weight?: string;
   className?: string;
   type?: string;
+  disabled?: boolean;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 

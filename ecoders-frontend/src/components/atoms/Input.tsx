@@ -16,6 +16,7 @@ interface InputType {
   padding?: string;
   className?: string;
   name?: string;
+  disabled?: boolean;
   onChange?: (e: any) => void;
   onBlur?: (e: any) => void;
 }

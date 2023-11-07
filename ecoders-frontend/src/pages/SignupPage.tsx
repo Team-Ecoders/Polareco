@@ -7,7 +7,11 @@ import Modal from '../components/atoms/Modal';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeModal, openModal } from '../redux/slice/modalSlice';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+//vite로 만든 프로젝트에서 환경변수 사용하기
+const APIURL = import.meta.env.VITE_API_URL;
 
 interface ErrorObject {
   email: string | null | undefined;
@@ -39,6 +43,55 @@ function Signup() {
     username: null,
   });
 
+  // 이메일 인증 상태
+  const [emailConfirm, setEmailConfirm] = useState({
+    emailSanding: false,
+    emailConfirmed: false,
+  });
+
+  // 타이머 관련 상태
+  const [timeLeft, setTimeLeft] = useState(180); // 초 단위로 시간을 저장
+  const [isRunning, setIsRunning] = useState(false);
+
+  //sign up 버튼 활성화 상태
+  const [isSubmitButton, setIsSubmitButton] = useState(false);
+
+  //이메일 인증 메일이 발송되면 유효 시간 카운트
+  useEffect(() => {
+    let timer: number;
+
+    if (isRunning && timeLeft > 0) {
+      //1초마다 시간 줄임
+      timer = setInterval(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timeLeft, isRunning]);
+
+  //sign up 버튼 활성화 유무 -> 잠시만 이따가..보고..
+  useEffect(() => {
+    // 오류가 없다면(newErrors에 true, truthy한 값이 있는지 검사 -> 즉 오류가 있는지 검사)
+    // error모든 값이 false라면 treu를 리턴함 -> 유효성 검사 통과
+    if (Object.values(errors).every(error => !error)) {
+      setIsSubmitButton(!isSubmitButton);
+    }
+  }, [formData, errors]);
+
+  // 이메일이 형식에 맞지 않을 때
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]$/;
+
+  // 닉네임이 형식에 맞지 않을 때
+  // /^(?!.*\s)(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{4,20}$/;
+  const usernameRegex = /^[a-zA-Z\dㄱ-ㅎ가-힣]{2,10}$/;
+
+  // 비밀번호가 형식에 맞지 않을 때
+  // /^(?![0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+`])[A-Za-z0-9!@#$%^&*()_+`]{8,20}$/;
+  const passwordRegex =
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[`~!@#$%^&*()\-_=+\[\]{}\\|;:'\",.<>\/?])[a-zA-Z\d`~!@#$%^&*()\-_=+\[\]{}\\|;:'\",.<>\/?]{8,20}$/;
+
   // 유효성 검사 함수
   const validateForm = (): boolean => {
     const newErrors: ErrorObject = {
@@ -55,7 +108,7 @@ function Signup() {
     }
 
     if (!formData.confirmEmail) {
-      newErrors.confirmEmail = '이메일로 전송된 인증코드를 입력하세요.';
+      newErrors.confirmEmail = '유효하지 않은 코드입니다.';
     }
 
     if (!formData.password) {
@@ -70,15 +123,10 @@ function Signup() {
       newErrors.username = '닉네임을 입력하세요.';
     }
 
-    // 이메일이 형식에 맞지 않을 때
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]$/;
-
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = '올바른 이메일 형식이 아닙니다.';
     }
 
-    // 닉네임이 형식에 맞지 않을 때
-    const usernameRegex = /^(?!.*\s)(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{4,20}$/;
     if (formData.username) {
       newErrors.username = !formData.username
         ? '닉네임을 입력하세요.'
@@ -91,17 +139,11 @@ function Signup() {
         : undefined;
     }
 
-    // 비밀번호가 형식에 맞지 않을 때
-    const passwordRegex =
-      /^(?![0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+`])[A-Za-z0-9!@#$%^&*()_+`]{8,20}$/;
-
     if (formData.password) {
       newErrors.password = !passwordRegex.test(formData.password)
-        ? /^[0-9]/.test(formData.password)
-          ? '비밀번호는 숫자로 시작할 수 없습니다.'
-          : formData.password.length < 8
-          ? '비밀번호는 8자 이상이어야 합니다.'
-          : undefined
+        ? '비밀번호는 영문/숫자/특수문자를 반드시 포함한 8자 이상이어야 합니다.'
+        : formData.password.length < 8
+        ? '비밀번호는 8자 이상이어야 합니다.'
         : undefined;
     }
 
@@ -117,7 +159,13 @@ function Signup() {
     return Object.values(newErrors).every(error => !error);
   };
 
-  // onChange
+  // 로그인 페이지로 이동
+  const linkToLoginPageHandler = () => {
+    navigate('/login');
+    dispatch(closeModal('signupModal')); // 모달이 열려 있지 않게 함
+  };
+
+  // input onChange 함수
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     let { name, value } = e.target;
 
@@ -139,16 +187,84 @@ function Signup() {
     });
   };
 
-  // 로그인 페이지로 이동
-  const linkToLoginPageHandler = () => {
-    navigate('/login');
-    dispatch(closeModal('signupModal')); // 모달이 열려 있지 않게 함
+  // email 인증 메일 전송 함수
+  const onClickSandingEmail = async () => {
+    if (!formData.email) {
+      setErrors({ ...errors, email: '이메일을 입력하세요' });
+      return;
+    } else if (formData.email && !emailRegex.test(formData.email)) {
+      setErrors({ ...errors, email: '올바른 이메일 형식이 아닙니다.' });
+      return;
+    } else {
+      const data = {
+        email: formData.email,
+      };
+      try {
+        const response = await axios.post(`${APIURL}/auth/sandemail`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status === 403) {
+          setErrors({ ...errors, email: '이미 존재하는 이메일입니다.' });
+          return;
+        }
+        if (response.status === 200) {
+          //인증메일 발송 완료-> 완료 모달
+          dispatch(openModal('sendingMailModal'));
+
+          //이메일이 전송됨
+          setEmailConfirm({ ...emailConfirm, emailSanding: true });
+
+          //인증 코드 유효시간 3분
+          setTimeLeft(180);
+          setIsRunning(true);
+        }
+      } catch (err: any) {
+        console.log(err);
+      }
+    }
+  };
+
+  // email 인증 확인 함수
+  const onClickConfirmEmail = async () => {
+    if (!formData.confirmEmail) {
+      setErrors({ ...errors, email: '유효하지 않은 코드입니다.' });
+      return;
+    } else {
+      const data = {
+        email: formData.email,
+        confirmEmail: formData.confirmEmail,
+      };
+      try {
+        const response = await axios.post(`${APIURL}/auth/confirmemail`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status === 400) {
+          setErrors({ ...errors, confirmEmail: '유효하지 않은 코드입니다.' });
+          return;
+        }
+        if (response.status === 200) {
+          //이메일 인증 완료
+          setEmailConfirm({ ...emailConfirm, emailConfirmed: true });
+          //인증 코드 타이머 비활성화
+          setIsRunning(false);
+        }
+      } catch (err: any) {
+        console.log(err);
+      }
+    }
   };
 
   // submit 함수
   const onSubmitHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
+    dispatch(closeModal('sendingMailModal'));
 
+    e.preventDefault();
     // 유효성 검사
     const isValid = validateForm();
     if (!isValid) {
@@ -174,44 +290,59 @@ function Signup() {
                   name="email"
                   value={formData.email}
                   onChange={changeHandler}
+                  disabled={emailConfirm.emailSanding && timeLeft >= 0}
                 />
-
-                {/* 이메일 인증 버튼 */}
-
+                {/* 인증메일 발송 버튼 */}
                 <EmailCertifyButton
                   type="button"
                   onClick={() => {
                     console.log('서버에 이메일 인증 메일 전송 요청');
                     //3분 타이머
-                  }}>
-                  인증메일 발송
+                  }}
+                  disabled={emailConfirm.emailSanding && timeLeft >= 0}>
+                  인증 메일 발송
                 </EmailCertifyButton>
               </EmailInputContainer>
               {errors.email && <ErrorText>{errors.email}</ErrorText>}
+              <ConfirmEmailModal modaltype="sendingMailModal">
+                <div className="modal-cont-wrapper">
+                  <div className="modal-title ">👋 인증 메일이 발송되었습니다.👋</div>
+                </div>
+              </ConfirmEmailModal>
 
               {/* 이메일 확인 인풋 */}
-              <EmailInputContainer>
-                <Input
-                  className="email-input"
-                  placeholder="인증코드"
-                  type="text"
-                  name="confirmEmail"
-                  value={formData.confirmEmail}
-                  onChange={changeHandler}
-                />
-                <EmailCertifyButton
-                  type="button"
-                  onClick={() => {
-                    console.log('서버에 이메일 인증 메일 전송 요청');
-                    //3분 타이머
-                  }}>
-                  인증하기
-                </EmailCertifyButton>
-              </EmailInputContainer>
-              {errors.confirmEmail ? (
-                <ErrorText>{errors.confirmEmail}</ErrorText>
-              ) : (
-                <Info>이메일 인증하기 버튼을 누르면 입력한 이메일로 인증코드가 발송됩니다.</Info>
+              {emailConfirm.emailSanding && (
+                <>
+                  <EmailInputContainer>
+                    <Input
+                      className="email-input"
+                      placeholder="인증코드"
+                      type="text"
+                      name="confirmEmail"
+                      value={formData.confirmEmail}
+                      onChange={changeHandler}
+                      disabled={emailConfirm.emailConfirmed}
+                    />
+                    <EmailCertifyButton
+                      type="button"
+                      onClick={() => {
+                        console.log('서버에 이메일 인증 메일 전송 요청');
+                        //3분 타이머
+                      }}
+                      disabled={emailConfirm.emailConfirmed}>
+                      이메일 인증하기
+                    </EmailCertifyButton>
+                  </EmailInputContainer>
+
+                  {/* 타이머 */}
+                  {isRunning && timeLeft !== 0 && (
+                    <TimerText>
+                      {Math.floor(timeLeft / 60)}:{(timeLeft % 60 < 10 ? '0' : '') + (timeLeft % 60)}
+                    </TimerText>
+                  )}
+                  {errors.confirmEmail && <ErrorText>{errors.confirmEmail}</ErrorText>}
+                  {emailConfirm.emailConfirmed && <ConfirmedText>이메일 인증이 완료되었습니다.</ConfirmedText>}
+                </>
               )}
 
               <Input
@@ -221,13 +352,27 @@ function Signup() {
                 name="password"
                 value={formData.password}
                 onChange={changeHandler}
+                onBlur={() => {
+                  let passwordError: string | null | undefined = undefined;
+                  if (!formData.password) {
+                    passwordError = '비밀번호를 입력하세요';
+                  }
+                  if (formData.password) {
+                    passwordError = !passwordRegex.test(formData.password)
+                      ? '비밀번호는 영문/숫자/특수문자를 반드시 포함한 8자 이상이어야 합니다.'
+                      : formData.password.length < 8
+                      ? '비밀번호는 8자 이상이어야 합니다.'
+                      : undefined;
+                  }
+                  setErrors({ ...errors, password: passwordError });
+                }}
               />
-
               {errors.password ? (
                 <ErrorText>{errors.password}</ErrorText>
               ) : (
                 <Info>비밀번호는 영문/숫자/특수문자를 반드시 포함한 8자 이상이어야 합니다.</Info>
               )}
+
               <Input
                 className="password-check-input"
                 placeholder="비밀번호 확인"
@@ -235,8 +380,18 @@ function Signup() {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={changeHandler}
+                onBlur={() => {
+                  let confirmPasswordError: string | null | undefined = undefined;
+                  if (!formData.confirmPassword) {
+                    confirmPasswordError = '비밀번호를 다시 한 번 입력하세요.';
+                  } else if (formData.confirmPassword !== formData.password) {
+                    confirmPasswordError = '비밀번호가 일치하지 않습니다.';
+                  }
+                  setErrors({ ...errors, confirmPassword: confirmPasswordError });
+                }}
               />
               {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
+
               <Input
                 className="username-input"
                 placeholder="닉네임"
@@ -244,14 +399,32 @@ function Signup() {
                 name="username"
                 value={formData.username}
                 onChange={changeHandler}
+                onBlur={() => {
+                  let usernameError: string | null | undefined = undefined;
+                  if (!formData.username) {
+                    usernameError = '닉네임을 입력하세요.';
+                  } else {
+                    usernameError = !usernameRegex.test(formData.username)
+                      ? '닉네임 형식이 맞지 않습니다.'
+                      : formData.username.length < 4
+                      ? '닉네임은 4자 이상이어야 합니다.'
+                      : formData.username.length > 20
+                      ? '닉네임은 20자 이하로 설정하세요.'
+                      : undefined;
+                  }
+                  setErrors({ ...errors, username: usernameError });
+                }}
               />
               {errors.username ? (
                 <ErrorText>{errors.username}</ErrorText>
               ) : (
-                <Info>닉네임은 한글/영문/숫자 포함 4자 이상 20자 이하여야 합니다.</Info>
+                <Info>닉네임은 공백을 포함할 수 없으며, 한글/영문/숫자 포함 4자 이상 20자 이하여야 합니다.</Info>
               )}
+
               <ButtonWrapper>
-                <SubmitButton className="sign-up-submit">Sign up</SubmitButton>
+                <SubmitButton className="sign-up-submit" disabled={isSubmitButton}>
+                  Sign up
+                </SubmitButton>
                 <SignUpModal modaltype="signupModal">
                   <div className="modal-cont-wrapper">
                     <p className="modal-content">회원가입에 성공하였습니다.</p>
@@ -359,7 +532,7 @@ const FormContainer = styled.div`
 const SignUpForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
   width: 20rem;
 
   @media (max-width: 480px) {
@@ -377,6 +550,29 @@ const ButtonWrapper = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   padding-top: 1rem;
+`;
+
+const ConfirmEmailModal = styled(Modal)`
+  width: 25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+
+  div > .modal-cont-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    justify-content: center;
+
+    > .modal-title {
+      font-family: Inter;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: normal;
+      text-align: center;
+    }
+  }
 `;
 
 const SignUpModal = styled(Modal)`
@@ -415,11 +611,12 @@ const EmailCertifyButton = styled(Button)`
   height: 35px;
   font-size: small;
   font-weight: normal;
-  background-color: #7092bfe4;
+  background-color: ${props => (props.disabled ? '#d4e2f1' : '#7092bfe4')};
   color: #fff;
   margin-left: 5px;
   border-radius: 10px;
   border: #7092bfe4;
+  cursor: ${props => props.disabled && 'default'};
   &:hover {
     background-color: #d4e2f1;
   }
@@ -429,7 +626,8 @@ const SubmitButton = styled(Button)`
   padding: 16px;
 
   &.sign-up-submit {
-    background-color: #7092bf;
+    cursor: ${props => props.disabled && 'default'};
+    background-color: ${props => (props.disabled ? '#d4e2f1' : '#7092bf')};
     color: #fff;
     border: none;
 
@@ -479,7 +677,28 @@ const IsUser = styled.div`
 `;
 
 const ErrorText = styled.div`
-  color: red;
+  color: #e73e3e;
+  font-size: 12px;
+  text-align: left;
+`;
+
+const TimerText = styled.div`
+  color: black;
+  width: 50px;
+  font-size: 15px;
+  position: relative;
+  font-weight: 500;
+  margin-left: 140px;
+  bottom: 35px;
+  text-align: right;
+  @media (max-width: 480px) {
+    // 화면 크기가 480px 이하일 때
+    margin-left: 120px;
+  }
+`;
+
+const ConfirmedText = styled.div`
+  color: #1b9c1b;
   font-size: 12px;
   text-align: left;
 `;
