@@ -63,9 +63,6 @@ function Signup() {
   const [timeLeft, setTimeLeft] = useState(180); // 초 단위로 시간을 저장
   const [isRunning, setIsRunning] = useState(false);
 
-  //sign up 버튼 활성화 상태
-  const [isSubmitButtonDisabled, setIsSubmitDisabledButton] = useState(true);
-
   //이메일 인증 메일이 발송되면 유효 시간 카운트
   useEffect(() => {
     let timer: number;
@@ -80,21 +77,6 @@ function Signup() {
       clearInterval(timer);
     };
   }, [timeLeft, isRunning]);
-
-  //sign up 버튼 활성화 확인
-  useEffect(() => {
-    // 오류가 없다면(newErrors에 true, truthy한 값이 있는지 검사 -> 즉 오류가 있는지 검사)
-    // error모든 값이 false라면 treu를 리턴함 -> 유효성 검사 통과
-    if (Object.values(errors).every(error => !error)) {
-      setIsSubmitDisabledButton(false);
-    } else {
-      if (emailConfirm.emailConfirmed) {
-        setIsSubmitDisabledButton(false);
-      } else {
-        setIsSubmitDisabledButton(true);
-      }
-    }
-  }, [errors, emailConfirm]);
 
   // 유효성 검사 함수
   const validateForm = (): boolean => {
@@ -226,7 +208,7 @@ function Signup() {
   // email 인증 확인 함수
   const onClickConfirmEmail = async () => {
     if (!formData.confirmEmail) {
-      setErrors({ ...errors, email: '유효하지 않은 코드입니다.' });
+      setErrors({ ...errors, confirmEmail: '유효하지 않은 코드입니다.' });
       return;
     } else {
       const data = {
