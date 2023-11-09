@@ -1,11 +1,15 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import modalReducer from '../slice/modalSlice';
+import loginSlice from '../slice/loginSlice';
+import userSlice from '../slice/userSlice';
 
 // configureStore를 사용하여 스토어를 설정
 const store = configureStore({
   reducer: {
     // reducer 속성에는 reducer들을 포함
     modal: modalReducer,
+    login: loginSlice,
+    user: userSlice,
   },
 });
 
