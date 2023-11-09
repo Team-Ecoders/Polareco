@@ -1,0 +1,27 @@
+logging:
+  level:
+    # org.springframework.jdbc.core 패키지의 로그 레벨: trace
+    org.springframework.jdbc.core: trace
+spring:
+  # JPA 쿼리문 로그 출력 여부 및 형식 설정
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  # 메일 전송 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_GMAIL_USERNAME}
+    password: ${SMTP_GMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  # 콘솔 로그에 색상 적용
+  output:
+    ansi:
+      enabled: always
