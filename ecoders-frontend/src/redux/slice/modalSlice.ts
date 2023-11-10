@@ -10,6 +10,8 @@ const initialState: ModalState = {
     //(회원가입, 로그인 시 필요 모달만 남김)
     sendingMailModal: false,
     findPwModal: false,
+    sandingPwModal: false,
+    setNewPwModal: false,
     loginModal: false,
   },
 };

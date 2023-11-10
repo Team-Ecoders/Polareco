@@ -79,13 +79,15 @@ function LoginPage() {
           navigate('/');
         }
       } catch (err: any) {
-        if (err.response.status === 400) {
+        if (err.response.status === 401) {
+          //403
           setError('아이디 / 이메일 또는 비밀번호가 잘못되었습니다.');
         }
       }
     }
   };
 
+  //이메일 유효성 검사 추가
   const findPwHandler = async (e: any) => {
     e.preventDefault();
     if (!findPwEmail) {
@@ -103,7 +105,7 @@ function LoginPage() {
         if (response.status === 200) {
           dispatch(closeModal('findPwModal'));
           dispatch(openModal('sandingPwModal'));
-          navigate('/login');
+          navigate('/');
         }
       } catch (err: any) {
         //가입한 적 없는 이메일로 pw 찾으려고 하는 경우
