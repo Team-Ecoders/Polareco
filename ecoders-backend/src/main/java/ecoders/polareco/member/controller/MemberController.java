@@ -6,6 +6,7 @@ import ecoders.polareco.member.dto.EmailVerificationCodeDto;
 import ecoders.polareco.member.service.MemberService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,4 +36,9 @@ public class MemberController {
         memberService.signup(signupDto.toMember());
         return ResponseEntity.ok().build();
     }
+
+//    @GetMapping("/myinfo")
+//    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal String email) {
+//
+//    }
 }

@@ -1,7 +1,7 @@
 package ecoders.polareco.redis.service;
 
 import ecoders.polareco.error.exception.ExceptionCode;
-import ecoders.polareco.error.exception.PolarecoException;
+import ecoders.polareco.error.exception.BusinessLogicException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class RedisService {
         String key = keyForEmailVerification(email);
         Object value = redisTemplate.opsForValue().get(key);
         if (value == null) {
-            throw new PolarecoException(ExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND);
+            throw new BusinessLogicException(ExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND);
         }
         return (String) value;
     }
@@ -35,7 +35,16 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
+    public void saveRefreshToken(String email, String refreshToken, long timeout) {
+        String key = keyForRefreshToken(email);
+        redisTemplate.opsForValue().set(key, refreshToken, timeout, TimeUnit.HOURS);
+    }
+
     private String keyForEmailVerification(String email) {
         return "verification:email:" + email;
+    }
+
+    private String keyForRefreshToken(String email) {
+        return "refreshtoken:" + email;
     }
 }

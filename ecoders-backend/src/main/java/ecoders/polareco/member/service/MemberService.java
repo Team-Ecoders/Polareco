@@ -1,7 +1,7 @@
 package ecoders.polareco.member.service;
 
 import ecoders.polareco.error.exception.ExceptionCode;
-import ecoders.polareco.error.exception.PolarecoException;
+import ecoders.polareco.error.exception.BusinessLogicException;
 import ecoders.polareco.member.entity.Member;
 import ecoders.polareco.member.event.event.EmailVerificationCodeIssueEvent;
 import ecoders.polareco.member.repository.MemberRepository;
@@ -38,7 +38,7 @@ public class MemberService {
     public void verifyEmail(String email, String verificationCode) {
         String savedVerificationCode = redisService.getEmailVerificationCode(email);
         if (!savedVerificationCode.equals(verificationCode)) {
-            throw new PolarecoException(ExceptionCode.EMAIL_VERIFICATION_CODE_MISMATCH);
+            throw new BusinessLogicException(ExceptionCode.EMAIL_VERIFICATION_CODE_MISMATCH);
         }
         redisService.deleteEmailVerificationCode(email);
     }
@@ -48,11 +48,19 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public Member findMemberByEmail(String email) {
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND);
+        }
+        return member;
+    }
+
     private void checkExistingMemberByEmail(String email) {
         Member existingMember = memberRepository.findByEmail(email);
         if (existingMember != null) {
             log.error("Member corresponding to the email already exists : {}", email);
-            throw new PolarecoException(ExceptionCode.MEMBER_ALREADY_EXISTS);
+            throw new BusinessLogicException(ExceptionCode.MEMBER_ALREADY_EXISTS);
         }
     }
 
