@@ -66,8 +66,8 @@ function LoginPage() {
 
         if (response.status === 200) {
           // 1. 로컬에 토큰 저장
-          const accessToken = response.headers['authorization'];
-          const refreshToken = response.headers['refresh-token'];
+          const accessToken = response.data['accessToken'];
+          const refreshToken = response.data['refreshToken'];
 
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken);

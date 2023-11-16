@@ -53,11 +53,10 @@ function Header() {
           <HeaderUserContainer>
             {isLoggedIn ? (
               <>
+                <HeaderProfilePic src={userInfo.profileImg} />
                 <Link to={'/myinfo'}>
-                  <HeaderProfilePic src={userInfo.profileImg} />
                   <UsernameButton>{userInfo.userName}</UsernameButton>
                 </Link>
-
                 <LogoutButton onClick={logoutHandler}>Logout</LogoutButton>
               </>
             ) : (

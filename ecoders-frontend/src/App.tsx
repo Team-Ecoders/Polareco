@@ -64,7 +64,7 @@ function App() {
             //refreshToken이 유효한 상태 accessToken 재등록
             if (response.status === 200) {
               //accessToken 재등록
-              const newAccessToken = response.headers['authorization'];
+              const newAccessToken = response.data['authorization'];
               localStorage.setItem('accessToken', newAccessToken);
 
               // 재등록 후 유저 정보 불러오기
