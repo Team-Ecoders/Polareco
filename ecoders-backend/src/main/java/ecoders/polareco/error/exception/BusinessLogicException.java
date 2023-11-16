@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class PolarecoException extends RuntimeException {
+public class BusinessLogicException extends RuntimeException {
 
     private final ExceptionCode exceptionCode;
 }
