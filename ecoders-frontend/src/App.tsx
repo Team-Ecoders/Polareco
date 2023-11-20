@@ -36,7 +36,7 @@ function App() {
       const refreshToken = localStorage.getItem('refreshToken');
 
       try {
-        const response = await axios.get(`${APIURL}/members/my-info`, {
+        const response = await axios.get(`${APIURL}/members/myinfo`, {
           headers: {
             Authorization: accessToken,
           },
@@ -46,16 +46,16 @@ function App() {
           //get한 정보 userSlice 저장
           dispatch(setUsername(response.data.username));
           dispatch(setEmail(response.data.email));
-          dispatch(setId(response.data.id));
-          response.data.imageUrl && dispatch(setProfileImg(response.data.imageUrl));
+          dispatch(setId(response.data.uuid));
+          response.data.imageUrl && dispatch(setProfileImg(response.data.profileImage));
           console.log('User information has been received successfully.');
         }
       } catch (err: any) {
         //accessToken 만료일 경우
-        if (err.response.status === 401) {
+        if (err.response.status === 403) {
           try {
             // refreshToken으로 accessToken 재발급 시도
-            const response = await axios.get(`${APIURL}/members/..`, {
+            const response = await axios.get(`${APIURL}/token/reissue`, {
               headers: {
                 'Refresh-Token': refreshToken,
               },
@@ -65,14 +65,16 @@ function App() {
             if (response.status === 200) {
               //accessToken 재등록
               const newAccessToken = response.data['authorization'];
+              const newRefreshToken = response.data['refreshToken'];
               localStorage.setItem('accessToken', newAccessToken);
+              localStorage.setItem('refreshToken', newRefreshToken);
 
               // 재등록 후 유저 정보 불러오기
               getUser();
             }
           } catch (err: any) {
             //refreshToken도 만료됨
-            if (err.resopnse.status === 401) {
+            if (err.resopnse.status === 403) {
               // 로컬 스토리지 토큰들 삭제
               localStorage.removeItem('accessToken');
               localStorage.removeItem('refreshToken');
