@@ -30,7 +30,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
         log.error("로그인 실패: {}", exception.toString());
         if (exception instanceof BadCredentialsException) {
             BusinessLogicErrorResponse body = new BusinessLogicErrorResponse(ExceptionCode.LOGIN_FAILED);
-            httpService.sendResponseBody(response, HttpStatus.UNAUTHORIZED.value(), body);
+            httpService.sendResponse(response, HttpStatus.UNAUTHORIZED.value(), body);
         }
     }
 }

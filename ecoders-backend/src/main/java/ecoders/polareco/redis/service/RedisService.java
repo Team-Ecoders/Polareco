@@ -40,6 +40,15 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, refreshToken, timeout, TimeUnit.HOURS);
     }
 
+    public String getRefreshToken(String email) {
+        String key = keyForRefreshToken(email);
+        Object value = redisTemplate.opsForValue().get(key);
+        if (value == null) {
+            throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_NOT_FOUND);
+        }
+        return (String) value;
+    }
+
     private String keyForEmailVerification(String email) {
         return "verification:email:" + email;
     }

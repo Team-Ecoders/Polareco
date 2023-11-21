@@ -21,7 +21,7 @@ public class HttpService {
         return objectMapper.readValue(request.getInputStream(), cls);
     }
 
-    public <B> void sendResponseBody(HttpServletResponse response, int statusCode, B body) throws IOException {
+    public <B> void sendResponse(HttpServletResponse response, int statusCode, B body) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(statusCode);
         response.getWriter().write(objectMapper.writeValueAsString(body));

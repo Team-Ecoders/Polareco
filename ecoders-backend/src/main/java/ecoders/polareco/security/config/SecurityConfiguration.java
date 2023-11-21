@@ -9,6 +9,7 @@ import ecoders.polareco.http.service.HttpService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +38,11 @@ public class SecurityConfiguration {
             .formLogin().disable()
             .httpBasic().disable()
             .cors(Customizer.withDefaults())
+            .authorizeHttpRequests(registry -> {
+                registry
+                    .antMatchers(HttpMethod.GET, "/member/my-info").authenticated()
+                    .anyRequest().permitAll();
+            })
             .apply(new CustomFilterConfigurer(httpService, jwtService))
             .and().build();
     }
@@ -68,6 +74,7 @@ public class SecurityConfiguration {
         @Override
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+
             PolarecoLoginFilter polarecoLoginFilter = new PolarecoLoginFilter(httpService, authenticationManager);
             LoginSuccessHandler loginSuccessHandler = new LoginSuccessHandler(jwtService, httpService);
             LoginFailureHandler loginFailureHandler = new LoginFailureHandler(httpService);
@@ -76,6 +83,9 @@ public class SecurityConfiguration {
             polarecoLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
             polarecoLoginFilter.setAuthenticationFailureHandler(loginFailureHandler);
             builder.addFilter(polarecoLoginFilter);
+
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, httpService);
+            builder.addFilterAfter(jwtVerificationFilter, PolarecoLoginFilter.class);
         }
     }
 }

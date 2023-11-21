@@ -24,13 +24,11 @@ public class PolarecoLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     @SneakyThrows
-    public Authentication attemptAuthentication(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+        throws AuthenticationException {
         LoginDto loginDto = httpService.readRequestBody(request, LoginDto.class);
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
-            loginDto.getPassword());
+            loginDto.getPassword(), null);
         log.info("인증 토큰 생성 완료");
         return authenticationManager.authenticate(authenticationToken);
     }

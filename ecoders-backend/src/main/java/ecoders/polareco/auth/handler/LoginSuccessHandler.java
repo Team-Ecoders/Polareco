@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.servlet.ServletException;
@@ -31,11 +30,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         HttpServletResponse response,
         Authentication authentication
     ) throws IOException, ServletException {
+        log.info("Authentication 객체: {}", authentication);
         Member member = ((PolarecoUserDetails) authentication.getPrincipal()).getMember();
         log.info("로그인 성공: {}", member.getEmail());
         String accessToken = jwtService.issueAccessToken(member);
         String refreshToken = jwtService.issueRefreshToken(member);
         JwtResponse body = new JwtResponse(accessToken, refreshToken);
-        httpService.sendResponseBody(response, HttpStatus.OK.value(), body);
+        httpService.sendResponse(response, HttpStatus.OK.value(), body);
     }
 }
