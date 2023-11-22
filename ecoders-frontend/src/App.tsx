@@ -11,7 +11,7 @@ import { RootState } from './redux/store/store';
 import axios from 'axios';
 import { login, logout } from './redux/slice/loginSlice';
 import { setEmail, setId, setUsername, setProfileImg } from './redux/slice/userSlice';
-import FindPasswordPage from './pages/FindPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import ErrorPage from './pages/ErrorPage';
 
 //vite로 만든 프로젝트에서 환경변수 사용하기
@@ -105,7 +105,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/findpw" element={<FindPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/error" element={<ErrorPage />} />
         </Routes>
         <Footer />

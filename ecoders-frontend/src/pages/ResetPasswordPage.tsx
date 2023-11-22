@@ -13,7 +13,7 @@ import axios from 'axios';
 //vite로 만든 프로젝트에서 환경변수 사용하기
 const APIURL = import.meta.env.VITE_API_URL;
 
-function FindPasswordPage() {
+function ResetPasswordPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,7 +84,7 @@ function FindPasswordPage() {
       confirmPassword: formData.confirmNewPassword,
     };
     try {
-      const response = await axios.post(`${APIURL}/findpw/`, data, {
+      const response = await axios.post(`${APIURL}/reset-password/`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -187,7 +187,7 @@ function FindPasswordPage() {
     </Container>
   );
 }
-export default FindPasswordPage;
+export default ResetPasswordPage;
 
 const Container = styled.section`
   display: flex;
