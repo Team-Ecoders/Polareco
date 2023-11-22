@@ -36,9 +36,11 @@ function App() {
       const refreshToken = localStorage.getItem('refreshToken');
 
       try {
-        const response = await axios.get(`${APIURL}/members/myinfo`, {
+        const response = await axios.get(`${APIURL}/member/my-info`, {
           headers: {
             Authorization: accessToken,
+            //ngrok 사용시에만 넣음
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
           },
         });
         // accessToken으로 유저 정보 불러오기 성공 (user 정보 저장)
@@ -47,7 +49,7 @@ function App() {
           dispatch(setUsername(response.data.username));
           dispatch(setEmail(response.data.email));
           dispatch(setId(response.data.uuid));
-          response.data.imageUrl && dispatch(setProfileImg(response.data.profileImage));
+          // response.data.imageUrl && dispatch(setProfileImg(response.data.profileImage));
           console.log('User information has been received successfully.');
         }
       } catch (err: any) {
@@ -58,6 +60,8 @@ function App() {
             const response = await axios.get(`${APIURL}/token/reissue`, {
               headers: {
                 'Refresh-Token': refreshToken,
+                //ngrok 사용시에만 넣음
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
               },
             });
 
@@ -92,7 +96,7 @@ function App() {
     if (isLoggedIn) {
       getUser();
     }
-  }, []);
+  });
 
   return (
     <>
