@@ -20,6 +20,8 @@ function Header() {
   const [ishambergerClicked, setIsHambergerClicked] = useState(false);
 
   const logoutHandler = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     dispatch(logout());
     navigate('/');
   };
