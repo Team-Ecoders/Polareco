@@ -2,6 +2,11 @@ logging:
   level:
     # org.springframework.jdbc.core 패키지의 로그 레벨: trace
     org.springframework.jdbc.core: trace
+# JWT 만료시간 및 비밀키 설정
+jwt:
+  access-token-expiration-hours: 1
+  refresh-token-expiration-hours: 168
+  secret-key: ${JWT_SECRET_KEY}
 spring:
   # JPA 쿼리문 로그 출력 여부 및 형식 설정
   jpa:
