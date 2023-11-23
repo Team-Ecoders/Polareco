@@ -19,6 +19,9 @@ function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // 이메일이 형식에 맞지 않을 때 (비밀번호 재설정 이메일)
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -92,6 +95,9 @@ function LoginPage() {
     e.preventDefault();
     if (!findPwEmail) {
       setFindPwError('이메일을 입력하세요.');
+    } else if (findPwEmail && !emailRegex.test(findPwEmail)) {
+      //이메일 유효성 겁사 추가
+      setFindPwError('올바른 이메일 형식이 아닙니다.');
     } else {
       setFindPwError('');
       const data = { findPwEmail: findPwEmail };
@@ -149,7 +155,7 @@ function LoginPage() {
               {/* 비밀번호 찾기 모달 */}
               <PwModal modaltype="findPwModal">
                 <div className="modal-cont-wrapper">
-                  <div className="modal-title">비밀번호 찾기</div>
+                  <div className="modal-title">비밀번호 재설정</div>
                   <p className="modal-content">
                     비밀번호를 잊으셨나요? 가입하신 이메일을 적어주세요.
                     <br />
