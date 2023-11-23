@@ -94,12 +94,13 @@ function App() {
       dispatch(login());
     } else {
       dispatch(logout());
+      setIsLoading(false);
     }
     // 로그인 상태일때 getUser 함수 호출
     if (isLoggedIn) {
       getUser();
     }
-  }, []);
+  });
 
   return (
     <>
