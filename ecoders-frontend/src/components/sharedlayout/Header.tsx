@@ -242,6 +242,9 @@ const HeaderUserContainer = styled.div`
   justify-content: center;
   text-align: center;
   align-items: center;
+  a {
+    text-decoration: none;
+  }
 `;
 
 const ButtonStyle = styled.button`

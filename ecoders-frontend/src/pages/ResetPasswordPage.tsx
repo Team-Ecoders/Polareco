@@ -329,15 +329,6 @@ const SubmitButton = styled(Button)`
   }
 `;
 
-const IsUser = styled.div`
-  color: #000;
-  font-family: Inter;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: normal;
-  cursor: pointer;
-`;
-
 const ErrorText = styled.div`
   color: #e73e3e;
   font-size: 12px;
