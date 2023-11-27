@@ -18,7 +18,13 @@ public enum ExceptionCode {
     JWT_EXPIRED(FORBIDDEN, "JWT expired"),
     JWT_INVALID(FORBIDDEN, "JWT invalid"),
     REFRESH_TOKEN_INVALID(FORBIDDEN, "Refresh token invalid"),
-    REFRESH_TOKEN_NOT_FOUND(NOT_FOUND, "Refresh token not found");
+    REFRESH_TOKEN_NOT_FOUND(NOT_FOUND, "Refresh token not found"),
+    POST_NOT_FOUND(NOT_FOUND, "Post not found"),
+    CANNOT_CHANGE_POST(FORBIDDEN, "Post cannot change"),
+    CANNOT_DELETE_POST(FORBIDDEN, "Post cannot delete"),
+    COMMENT_NOT_FOUND(NOT_FOUND, "Comment not found"),
+    CANNOT_CHANGE_COMMENT(FORBIDDEN, "Comment cannot change"),
+    CANNOT_DELETE_COMMENT(FORBIDDEN, "Comment cannot delete");
 
     private final HttpStatus httpStatus;
 

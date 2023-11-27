@@ -17,3 +17,15 @@ spring:
   redis:
     host: localhost
     port: 6379
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_IAM_AccessKey}
+      secretKey: ${AWS_IAM_SecretKey}
+    s3:
+      bucket: polareco-deploy
+      dir: images/post
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
