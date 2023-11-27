@@ -94,10 +94,13 @@ public class PostController {
 
     @GetMapping("/{post-id}")
    public ResponseEntity<PostDto.PostResponseDtoV1> getPost(@PathVariable("post-id") long postId,
-                                                            HttpServletRequest request,
-                                                            HttpServletResponse response){
+                                                            @AuthenticationPrincipal String email) {
         PostDto.PostResponseDtoV1 foundPost = postService.getPost(postId);
-        postService.updateView(postId, request, response);
+        if (!email.isEmpty()) {
+            Member member = postService.findMemberByEmail(email);
+            String memberId = member.getUuid().toString();
+            postService.updateView(postId, memberId);
+        }
         return ResponseEntity.ok(foundPost);
     }
 

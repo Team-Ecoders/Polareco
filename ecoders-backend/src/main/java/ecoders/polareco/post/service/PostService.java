@@ -11,6 +11,7 @@ import ecoders.polareco.post.entity.Comment;
 import ecoders.polareco.post.entity.Post;
 import ecoders.polareco.post.repository.CommentRepository;
 import ecoders.polareco.post.repository.PostRepository;
+import ecoders.polareco.redis.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,15 +34,17 @@ public class PostService {
     private final MemberService memberService;
     private final CommentRepository commentRepository;
 
+    private final RedisService redisService;
     public PostService(MemberRepository memberRepository,
                        PostRepository postRepository,
                        CommentRepository commentRepository,
                        MemberService memberService,
-                       AmazonS3 amazonS3) {
+                       RedisService redisService) {
         this.memberRepository = memberRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.memberService = memberService;
+        this.redisService = redisService;
     }
 
 
@@ -177,6 +182,38 @@ public class PostService {
         }
     }
 
-    public void updateView(long postId, HttpServletRequest request, HttpServletResponse response) {
+    public void updateView(long postId,String memberId) {
+        String viewCount = redisService.getData(String.valueOf(memberId));
+        if (viewCount == null) {
+            redisService.setDateExpire(String.valueOf(memberId), postId + "_", calculateTimeUntilMidnight());
+            postRepository.updateView(postId);
+        } else {
+            String[] strArray = viewCount.split("_");
+            List<String> redisPortfolioList = Arrays.asList(strArray);
+
+            boolean isView = false;
+
+            if (!redisPortfolioList.isEmpty()) {
+                for (String redisPortfolioId : redisPortfolioList) {
+                    if (String.valueOf(postId).equals(redisPortfolioId)) {
+                        isView = true;
+                        break;
+                    }
+                }
+                if (!isView) {
+                    viewCount += postId + "_";
+
+                    redisService.setDateExpire(String.valueOf(memberId), viewCount, calculateTimeUntilMidnight());
+                    postRepository.updateView(postId);
+                }
+            }
+        }
+
+    }
+
+    public long calculateTimeUntilMidnight() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        return ChronoUnit.SECONDS.between(now, midnight);
     }
 }
