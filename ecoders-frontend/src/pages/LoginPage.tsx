@@ -100,9 +100,9 @@ function LoginPage() {
       setFindPwError('올바른 이메일 형식이 아닙니다.');
     } else {
       setFindPwError('');
-      const data = { findPwEmail: findPwEmail };
+      const data = { email: findPwEmail };
       try {
-        const response = await axios.post(`${APIURL}/login/findpw`, data, {
+        const response = await axios.post(`${APIURL}/password/forgot/issue`, data, {
           headers: {
             'Content-Type': 'application/json',
           },

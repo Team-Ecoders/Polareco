@@ -31,13 +31,10 @@ function ResetPasswordPage() {
         email: email,
         token: token,
       };
+      console.log(email);
+      console.log(token);
       try {
-        const response = await axios.post(`${APIURL}/findpw/confirmtoken`, data, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
+        const response = await axios.get(`${APIURL}/password/forgot/verification`, { params: data });
         if (response.status === 200) {
           console.log('유효한 토큰!');
         }
@@ -80,11 +77,10 @@ function ResetPasswordPage() {
       //router기능으로 email, token받아와야함
       email: email,
       token: token,
-      password: formData.newPassword,
-      confirmPassword: formData.confirmNewPassword,
+      newPassword: formData.newPassword,
     };
     try {
-      const response = await axios.post(`${APIURL}/reset-password/`, data, {
+      const response = await axios.patch(`${APIURL}/password/forgot/reset`, data, {
         headers: {
           'Content-Type': 'application/json',
         },

@@ -16,8 +16,9 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Session setIsLoading={setIsLoading} />
-        {!isLoading && (
+        {isLoading ? (
+          <Session setIsLoading={setIsLoading} />
+        ) : (
           <>
             <Header />
             <Routes>

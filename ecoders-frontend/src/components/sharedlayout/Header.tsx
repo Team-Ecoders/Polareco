@@ -9,6 +9,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store/store';
 import { logout } from '../../redux/slice/loginSlice';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+//vite로 만든 프로젝트에서 환경변수 사용하기
+const APIURL = import.meta.env.VITE_API_URL;
 
 function Header() {
   const navigate = useNavigate();
@@ -19,11 +23,20 @@ function Header() {
 
   const [ishambergerClicked, setIsHambergerClicked] = useState(false);
 
-  const logoutHandler = () => {
+  const logoutHandler = async () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    dispatch(logout());
-    navigate('/');
+    try {
+      const response = await axios.post(`${APIURL}/logout`
+      );
+      if (response.status === 200) {
+        dispatch(logout());
+        navigate('/');
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+    
   };
   return (
     <>

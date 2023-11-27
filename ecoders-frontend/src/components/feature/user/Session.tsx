@@ -17,8 +17,8 @@ function Session({ setIsLoading }: { setIsLoading: React.Dispatch<React.SetState
   async function getUser() {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const response = await axios.get(`${APIURL}/member/my-info`, {
         headers: {
           Authorization: accessToken,
@@ -84,14 +84,15 @@ function Session({ setIsLoading }: { setIsLoading: React.Dispatch<React.SetState
     //토큰 유무로 로그인 상태 저장
     if (localStorage.getItem('accessToken') && localStorage.getItem('refreshToken')) {
       dispatch(login());
+      getUser();
     } else {
       dispatch(logout());
       setIsLoading(false);
     }
-    // 로그인 상태일때 getUser 함수 호출
-    if (isLoggedIn) {
-      getUser();
-    }
+    // // 로그인 상태일때 getUser 함수 호출
+    // if (isLoggedIn) {
+    //   getUser();
+    // }
   });
   return <></>;
 }
