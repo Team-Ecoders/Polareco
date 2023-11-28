@@ -73,25 +73,30 @@ function ResetPasswordPage() {
 
   const setNewPasswordHandler = async (e: any) => {
     e.preventDefault();
-    const data = {
-      //router기능으로 email, token받아와야함
-      email: email,
-      token: token,
-      newPassword: formData.newPassword,
-    };
-    try {
-      const response = await axios.patch(`${APIURL}/password/forgot/reset`, data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    if (formData.newPassword != formData.confirmNewPassword) {
+      setErrors({ ...errors, confirmPassword: '비밀번호가 일치하지 않습니다.' });
+      return;
+    } else {
+      const data = {
+        //router기능으로 email, token받아와야함
+        email: email,
+        token: token,
+        newPassword: formData.newPassword,
+      };
+      try {
+        const response = await axios.patch(`${APIURL}/password/forgot/reset`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-      if (response.status === 200) {
-        dispatch(openModal('setNewPwModal'));
+        if (response.status === 200) {
+          dispatch(openModal('setNewPwModal'));
+        }
+      } catch (err: any) {
+        //재등록 실패 시... 토큰 만료..........?
+        navigate('/error');
       }
-    } catch (err: any) {
-      //재등록 실패 시... 토큰 만료..........?
-      navigate('/error');
     }
   };
   return (
