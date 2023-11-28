@@ -11,6 +11,8 @@ const initialState: ModalState = {
     signupModal: false,
     sendingMailModal: false,
     findPwModal: false,
+    sandingPwModal: false,
+    setNewPwModal: false,
     loginModal: false,
   },
 };
