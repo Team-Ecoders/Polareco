@@ -31,6 +31,10 @@ public class Member extends AuditableEntity {
     @Column(nullable = true)
     private String password;
 
+    @Setter
+    @Column(nullable = true, updatable = true)
+    private String profileImage;
+
     public Member(String email, String username) {
         this(email, username, null);
     }
@@ -39,6 +43,7 @@ public class Member extends AuditableEntity {
         this.email = email;
         this.username = username;
         this.password = password;
+        this.profileImage = null;
     }
 
     public boolean hasPassword() {
