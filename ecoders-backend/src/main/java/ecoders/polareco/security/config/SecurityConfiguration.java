@@ -4,9 +4,11 @@ import ecoders.polareco.auth.filter.JwtVerificationFilter;
 import ecoders.polareco.auth.filter.PolarecoLoginFilter;
 import ecoders.polareco.auth.handler.LoginFailureHandler;
 import ecoders.polareco.auth.handler.LoginSuccessHandler;
+import ecoders.polareco.auth.handler.LogoutHandler;
 import ecoders.polareco.auth.jwt.service.JwtService;
 import ecoders.polareco.http.service.HttpService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +28,9 @@ import java.util.List;
 @Configuration
 public class SecurityConfiguration {
 
+    @Value("${client-url}")
+    private String clientUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(
         HttpSecurity builder,
@@ -38,7 +43,8 @@ public class SecurityConfiguration {
             .formLogin().disable()
             .httpBasic().disable()
             .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(registry -> {
+            .logout().logoutSuccessHandler(new LogoutHandler())
+            .and().authorizeHttpRequests(registry -> {
                 registry
                     .antMatchers(HttpMethod.GET, "/member/my-info").authenticated()
                     .anyRequest().permitAll();
@@ -50,7 +56,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+        corsConfiguration.setAllowedOrigins(List.of(clientUrl));
         corsConfiguration.setAllowedMethods(List.of("POST", "GET", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
 
