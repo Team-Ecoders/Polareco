@@ -1,24 +1,31 @@
 package ecoders.polareco.member.service;
 
-import ecoders.polareco.error.exception.ExceptionCode;
 import ecoders.polareco.error.exception.BusinessLogicException;
+import ecoders.polareco.error.exception.ExceptionCode;
 import ecoders.polareco.member.entity.Member;
 import ecoders.polareco.member.event.event.EmailVerificationCodeIssueEvent;
+import ecoders.polareco.member.event.event.PasswordResetTokenIssueEvent;
 import ecoders.polareco.member.repository.MemberRepository;
 import ecoders.polareco.member.util.VerificationCodeIssuer;
 import ecoders.polareco.redis.service.RedisService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@AllArgsConstructor
+import java.util.UUID;
+
+@RequiredArgsConstructor
 @Transactional
 @Service
 @Slf4j
 public class MemberService {
+
+    @Value("${client-url}")
+    private String clientUrl;
 
     private final RedisService redisService;
 
@@ -44,7 +51,31 @@ public class MemberService {
     }
 
     public void signup(Member member) {
-        encodePassword(member);
+        String encodedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encodedPassword);
+        memberRepository.save(member);
+    }
+
+    public void sendPasswordResetMail(String email) {
+        Member member = findMemberByEmail(email);
+        String token = UUID.randomUUID().toString();
+        redisService.savePasswordResetToken(member.getEmail(), token);
+        eventPublisher.publishEvent(new PasswordResetTokenIssueEvent(clientUrl, member.getEmail(), token));
+    }
+
+    public void verifyPasswordResetToken(String email, String token) {
+        String savedToken = redisService.getPasswordResetToken(email);
+        if (!savedToken.equals(token)) {
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_RESET_TOKEN_MISMATCH);
+        }
+        redisService.deletePasswordResetToken(email);
+    }
+
+    public void resetPassword(String email, String token, String newPassword) {
+        Member member = findMemberByEmail(email);
+        verifyPasswordResetToken(member.getEmail(), token);
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        member.setPassword(encodedNewPassword);
         memberRepository.save(member);
     }
 
@@ -62,10 +93,5 @@ public class MemberService {
             log.error("Member corresponding to the email already exists : {}", email);
             throw new BusinessLogicException(ExceptionCode.MEMBER_ALREADY_EXISTS);
         }
-    }
-
-    private void encodePassword(Member member) {
-        String encodedPassword = passwordEncoder.encode(member.getPassword());
-        member.setPassword(encodedPassword);
     }
 }

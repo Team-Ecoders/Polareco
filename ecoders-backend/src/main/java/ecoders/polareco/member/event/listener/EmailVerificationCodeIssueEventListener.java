@@ -18,12 +18,12 @@ public class EmailVerificationCodeIssueEventListener {
 
     @Async
     @TransactionalEventListener
-    public void sendEmailVerificationCode(EmailVerificationCodeIssueEvent event) {
-        mailSender.send(writeSimpleMailMessage(event));
-        log.info("Sent verification code: {}", event.getEmail());
+    public void sendEmailVerificationMail(EmailVerificationCodeIssueEvent event) {
+        mailSender.send(emailVerificationCodeMessage(event));
+        log.info("이메일 인증 메일 발송 완료: {}", event.getEmail());
     }
 
-    private SimpleMailMessage writeSimpleMailMessage(EmailVerificationCodeIssueEvent event) {
+    private SimpleMailMessage emailVerificationCodeMessage(EmailVerificationCodeIssueEvent event) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setSubject("[Polareco] 이메일 인증 코드");
         message.setTo(event.getEmail());

@@ -1,11 +1,6 @@
 package ecoders.polareco.member.controller;
 
-import ecoders.polareco.auth.user.PolarecoUserDetails;
-import ecoders.polareco.auth.util.AuthUtil;
-import ecoders.polareco.member.dto.EmailDto;
-import ecoders.polareco.member.dto.MemberInfoDto;
-import ecoders.polareco.member.dto.SignupDto;
-import ecoders.polareco.member.dto.EmailVerificationCodeDto;
+import ecoders.polareco.member.dto.*;
 import ecoders.polareco.member.entity.Member;
 import ecoders.polareco.member.service.MemberService;
 import lombok.AllArgsConstructor;
@@ -47,5 +42,23 @@ public class MemberController {
     public ResponseEntity<MemberInfoDto> getMyInfo(@AuthenticationPrincipal String email) {
         Member member = memberService.findMemberByEmail(email);
         return ResponseEntity.ok(new MemberInfoDto(member));
+    }
+
+    @PostMapping("/password/forgot/issue")
+    public ResponseEntity<?> sendPasswordResetMail(@RequestBody @Valid EmailDto emailDto) {
+        memberService.sendPasswordResetMail(emailDto.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/password/forgot/verification")
+    public ResponseEntity<?> verifyPasswordResetToken(@RequestBody PasswordResetVerificationDto dto) {
+        memberService.verifyPasswordResetToken(dto.getEmail(), dto.getToken());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/password/forgot/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid PasswordResetDto dto) {
+        memberService.resetPassword(dto.getEmail(), dto.getToken(), dto.getNewPassword());
+        return ResponseEntity.ok().build();
     }
 }

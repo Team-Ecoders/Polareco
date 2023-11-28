@@ -23,6 +23,9 @@ public class MailSenderConfiguration {
     @Value("${spring.mail.password}")
     private String password;
 
+    @Value("${spring.mail.default-encoding}")
+    private String defaultEncoding;
+
     @Value("${spring.mail.properties.mail.smtp.auth}")
     private boolean auth;
 
@@ -36,6 +39,7 @@ public class MailSenderConfiguration {
         javaMailSenderImpl.setPort(port);
         javaMailSenderImpl.setUsername(username);
         javaMailSenderImpl.setPassword(password);
+        javaMailSenderImpl.setDefaultEncoding(defaultEncoding);
 
         Properties properties = javaMailSenderImpl.getJavaMailProperties();
         properties.put("mail.smtp.auth", auth);

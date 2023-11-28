@@ -1,7 +1,7 @@
 package ecoders.polareco.redis.service;
 
-import ecoders.polareco.error.exception.ExceptionCode;
 import ecoders.polareco.error.exception.BusinessLogicException;
+import ecoders.polareco.error.exception.ExceptionCode;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -49,11 +49,34 @@ public class RedisService {
         return (String) value;
     }
 
+    public void savePasswordResetToken(String email, String token) {
+        String key = keyForPasswordResetToken(email);
+        redisTemplate.opsForValue().set(key, token, 30, TimeUnit.MINUTES);
+    }
+
+    public String getPasswordResetToken(String email) {
+        String key = keyForPasswordResetToken(email);
+        Object value = redisTemplate.opsForValue().get(key);
+        if (value == null) {
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_RESET_TOKEN_NOT_FOUND);
+        }
+        return (String) value;
+    }
+
+    public void deletePasswordResetToken(String email) {
+        String key = keyForPasswordResetToken(email);
+        redisTemplate.delete(key);
+    }
+
     private String keyForEmailVerification(String email) {
-        return "verification:email:" + email;
+        return "email-verification:" + email;
     }
 
     private String keyForRefreshToken(String email) {
-        return "refreshtoken:" + email;
+        return "refresh-token:" + email;
+    }
+
+    private String keyForPasswordResetToken(String email) {
+        return "password-reset:" + email;
     }
 }
