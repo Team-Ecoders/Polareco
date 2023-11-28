@@ -13,6 +13,8 @@ ecoders-frontend/dist
 ecoders-frontend/dist-ssr
 ecoders-frontend/*.local
 
+ecoders-frontend/.env
+
 # Editor directories and files
 ecoders-frontend/.vscode/*
 !ecoders-frontend/.vscode/extensions.json

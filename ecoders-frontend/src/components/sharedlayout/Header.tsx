@@ -2,69 +2,85 @@ import styled from 'styled-components';
 import Logo from '../../assets/Logo.png';
 import { useState } from 'react';
 import { TfiMenu } from 'react-icons/tfi';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import profileImage from '../../assets/ProfileImage.svg';
+import { RootState } from '../../redux/store/store';
+import { logout } from '../../redux/slice/loginSlice';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+//vite로 만든 프로젝트에서 환경변수 사용하기
+const APIURL = import.meta.env.VITE_API_URL;
 
 function Header() {
-  //반응형 css 제작을 위한 상태 값
-  // const [loginStates, setLoginStates] = useState(false);
-  const [loginStates, setLoginStates] = useState(true);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const isLoggedIn = useSelector((state: RootState) => state.login.isLoggedIn);
+  const userInfo = useSelector((state: RootState) => state.user);
 
   const [ishambergerClicked, setIsHambergerClicked] = useState(false);
-  // const navigate = useNavigate();
 
-  // const navigateToMain = () => {
-  //   navigate('/');
-  // };
-
-  // const navigateToMyInfo = () => {
-  //   navigate('/myinfo');
-  // };
-
-  // const navigateToSignUp = () => {
-  //   navigate('/signup');
-  // };
-
+  const logoutHandler = async () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    try {
+      const response = await axios.post(`${APIURL}/logout`
+      );
+      if (response.status === 200) {
+        dispatch(logout());
+        navigate('/');
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+    
+  };
   return (
     <>
       <Entire>
         <HeaderContainer>
           <HeaderLogoNavberContainer>
-            <HeaderLogoContainer>
-              {/* onClick={navigateToMain} */}
-              <HeaderLogo src={Logo} />
-              {/* onClick={navigateToMain} */}
-              <HeaderLogoText>POLARECO</HeaderLogoText>
-            </HeaderLogoContainer>
+            <Link to={'/'}>
+              <HeaderLogoContainer>
+                <HeaderLogo src={Logo} />
+                <HeaderLogoText>POLARECO</HeaderLogoText>
+              </HeaderLogoContainer>
+            </Link>
             <HeaderNavbarContainer>
-              <Nav>Services</Nav>
-              <Nav>Eco-Habit</Nav>
-              <Nav>Community</Nav>
-              <Nav>Contact</Nav>
+              <Nav>
+                <Link to={'/services'}>Services</Link>
+              </Nav>
+              <Nav>
+                <Link to={'/ecohabit'}>Eco-Habit</Link>
+              </Nav>
+              <Nav>
+                <Link to={'/community'}>Community</Link>
+              </Nav>
+              <Nav>
+                <Link to={'/contact'}>Contact</Link>
+              </Nav>
             </HeaderNavbarContainer>
           </HeaderLogoNavberContainer>
 
           <HeaderUserContainer>
-            {loginStates ? (
+            {isLoggedIn ? (
               <>
-                <HeaderProfilePic src={profileImage} />
-                <UsernameButton>User Name</UsernameButton>
-                <LogoutButton>Logout</LogoutButton>
+                <HeaderProfilePic src={userInfo.profileImg} />
+                <Link to={'/myinfo'}>
+                  <UsernameButton>{userInfo.userName}</UsernameButton>
+                </Link>
+                <LogoutButton onClick={logoutHandler}>Logout</LogoutButton>
               </>
             ) : (
               <>
-                <LoginButton
-                  onClick={() => {
-                    console.log('로그인 시도');
-                  }}>
-                  Login
+                <LoginButton>
+                  <Link to={'/login'}>Login</Link>
                 </LoginButton>
-                <CreateAccountButton
-                  onClick={() => {
-                    console.log('회원가입 시도');
-                  }}>
-                  Create Account
+                <CreateAccountButton>
+                  <Link to={'/signup'}>Create Account</Link>
                 </CreateAccountButton>
               </>
             )}
@@ -79,10 +95,18 @@ function Header() {
         {ishambergerClicked ? (
           <HeaderHambergerMenuContainer>
             <ul>
-              <li>Services</li>
-              <li>Eco-Habit</li>
-              <li>Community</li>
-              <li>Contact</li>
+              <li>
+                <Link to={'/services'}>Services</Link>
+              </li>
+              <li>
+                <Link to={'/ecohabit'}>Eco-Habit</Link>
+              </li>
+              <li>
+                <Link to={'/community'}>Community</Link>
+              </li>
+              <li>
+                <Link to={'/contact'}>Contact</Link>
+              </li>
             </ul>
           </HeaderHambergerMenuContainer>
         ) : null}
@@ -116,6 +140,9 @@ const HeaderContainer = styled.div`
 const HeaderLogoNavberContainer = styled.div`
   display: flex;
   justify-content: center;
+  a {
+    text-decoration: none;
+  }
 `;
 
 const HeaderLogoContainer = styled.div`
@@ -218,12 +245,19 @@ const Nav = styled.div`
     // 화면 크기가 1024px 이하일 때 ipad
     font-size: 18px;
   }
+  a {
+    text-decoration: none;
+    color: black;
+  }
 `;
 const HeaderUserContainer = styled.div`
   display: flex;
   justify-content: center;
   text-align: center;
   align-items: center;
+  a {
+    text-decoration: none;
+  }
 `;
 
 const ButtonStyle = styled.button`
@@ -325,6 +359,10 @@ const LoginButton = styled(ButtonStyle)`
   @media (max-width: 480px) {
     margin-left: 3px;
   }
+  a {
+    text-decoration: none;
+    color: white;
+  }
 `;
 
 const CreateAccountButton = styled(ButtonStyle)`
@@ -337,6 +375,10 @@ const CreateAccountButton = styled(ButtonStyle)`
   margin-left: 10px;
   @media (max-width: 480px) {
     margin-left: 3px;
+  }
+  a {
+    text-decoration: none;
+    color: #141414;
   }
 `;
 
@@ -378,6 +420,10 @@ const HeaderHambergerMenuContainer = styled.div`
       cursor: pointer;
       font-weight: bold;
       border-bottom: 1px solid #000;
+    }
+    a {
+      text-decoration: none;
+      color: #000;
     }
   }
 `;
