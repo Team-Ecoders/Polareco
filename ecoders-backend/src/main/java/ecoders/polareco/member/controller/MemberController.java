@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -59,6 +60,24 @@ public class MemberController {
     @PatchMapping("/password/forgot/reset")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid PasswordResetDto dto) {
         memberService.resetPassword(dto.getEmail(), dto.getToken(), dto.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/update/profile-image")
+    public ResponseEntity<ProfileImageDto> updateProfileImage(
+        @AuthenticationPrincipal String email,
+        @RequestPart MultipartFile imageFile
+    ) {
+        String profileImage = memberService.updateProfileImage(email, imageFile);
+        return ResponseEntity.ok(new ProfileImageDto(profileImage));
+    }
+
+    @PatchMapping("/update/password")
+    public ResponseEntity<?> updatePassword(
+        @AuthenticationPrincipal String email,
+        @RequestBody @Valid PasswordUpdateDto passwordUpdateDto
+    ) {
+        memberService.updatePassword(email, passwordUpdateDto.getCurrentPassword(), passwordUpdateDto.getNewPassword());
         return ResponseEntity.ok().build();
     }
 }

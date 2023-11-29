@@ -1,5 +1,6 @@
 package ecoders.polareco.member.service;
 
+import ecoders.polareco.aws.service.S3Service;
 import ecoders.polareco.error.exception.BusinessLogicException;
 import ecoders.polareco.error.exception.ExceptionCode;
 import ecoders.polareco.member.entity.Member;
@@ -15,6 +16,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -28,6 +30,8 @@ public class MemberService {
     private String clientUrl;
 
     private final RedisService redisService;
+
+    private final S3Service s3Service;
 
     private final MemberRepository memberRepository;
 
@@ -76,6 +80,23 @@ public class MemberService {
         verifyPasswordResetToken(member.getEmail(), token);
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         member.setPassword(encodedNewPassword);
+        memberRepository.save(member);
+    }
+
+    public String updateProfileImage(String email, MultipartFile imageFile) {
+        Member member = findMemberByEmail(email);
+        String profileImageUrl = s3Service.uploadImage(imageFile, S3Service.ImageType.PROFILE);
+        member.setProfileImage(profileImageUrl);
+        memberRepository.save(member);
+        return profileImageUrl;
+    }
+
+    public void updatePassword(String email, String currentPassword, String newPassword) {
+        Member member = findMemberByEmail(email);
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_MISMATCH);
+        }
+        member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
     }
 

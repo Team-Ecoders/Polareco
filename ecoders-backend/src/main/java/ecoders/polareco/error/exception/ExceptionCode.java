@@ -22,7 +22,8 @@ public enum ExceptionCode {
     MAIL_MESSAGING_FAILED(INTERNAL_SERVER_ERROR, "Mail messaging failed"),
     PASSWORD_RESET_TOKEN_NOT_FOUND(NOT_FOUND, "Password reset token not found"),
     PASSWORD_RESET_TOKEN_MISMATCH(FORBIDDEN, "Password reset token mismatch"),
-    PASSWORD_MISMATCH(FORBIDDEN, "Password mismatch");
+    PASSWORD_MISMATCH(FORBIDDEN, "Password mismatch"),
+    IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "Image upload failed");
 
     private final HttpStatus httpStatus;
 
