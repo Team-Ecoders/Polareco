@@ -1,12 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import ProfileImg from '../../assets/ProfileImage.svg';
-
-interface userState {
-  userName: string;
-  userId: string;
-  email: string;
-  profileImg: string;
-}
+import { userState } from '../../interfaces/communityInterfaces';
 
 const initialState: userState = {
   userName: '',
@@ -33,17 +27,6 @@ export const userSlice = createSlice({
     },
   },
 });
-
-export type user = {
-  user: {
-    accessToken: string | null;
-    refreshToken: string | null;
-    username: string;
-    id: string;
-    // id: number;
-    stamp: number;
-  };
-};
 
 export const { setUsername, setEmail, setId, setProfileImg } = userSlice.actions;
 export default userSlice.reducer;

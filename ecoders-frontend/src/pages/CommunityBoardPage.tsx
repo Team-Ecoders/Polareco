@@ -38,7 +38,7 @@ function CommunityBoardPage() {
   // 페이지에서 무한스크롤로 lastPostId가 변경되면서 posts를 get하는 함수
   async function getPosts() {
     let getPostCount = 10;
-    let searchKeyWord = '';
+    let searchKeyWord = keyWord;
 
     if (lastPostId === 99999) {
       getPostCount = 20;
@@ -48,9 +48,14 @@ function CommunityBoardPage() {
       searchKeyWord = `&keyword=${keyWord}`;
     }
     axios
-      .get(`${APIURL}/posts/all?lastPostId=${lastPostId}&size=10${searchKeyWord}`)
+      .get(`${APIURL}/posts/all?lastPostId=${lastPostId}&size=${getPostCount}${searchKeyWord}`)
       .then(function (response) {
-        setPosts(prevData => [...prevData, ...response.data]);
+        if (getPostCount === 20) {
+          setPosts(response.data);
+        } else {
+          setPosts(prevData => [...prevData, ...response.data]);
+        }
+
         if (response.data.length < getPostCount) {
           setlastPostId(0);
         } else {
@@ -62,10 +67,6 @@ function CommunityBoardPage() {
         console.log(error);
       });
   }
-
-  useEffect(() => {
-    getPosts();
-  }, [keyWord]);
 
   // 스크롤 이벤트 핸들러를 창에 추가
   useEffect(() => {
@@ -87,11 +88,17 @@ function CommunityBoardPage() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    if (lastPostId === 99999) {
+      getPosts();
+      return;
+    } else {
+      window.addEventListener('scroll', handleScroll);
+    }
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [isLoading, keyWord, lastPostId]);
+  });
 
   //필터 기능(특정 state(여기선 filteredData)가 바뀔 때마다 실행)
   useEffect(() => {
@@ -172,7 +179,6 @@ export default CommunityBoardPage;
 
 const BoardLayout = styled.div`
   width: 100%;
-  height: 100vh;
 `;
 
 const BoardHead = styled.div`

@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
 import { card } from '../../../interfaces/communityInterfaces';
-import { user } from '../../../redux/slice/userSlice';
+import { RootState } from '../../../redux/store/store';
 
 function PostCard({ data }: { data: Array<card> }) {
-  const USERID = useSelector((state: user) => state.user.id);
+  const USERID = useSelector((state: RootState) => state.user.userId);
   const navigate = useNavigate();
 
   function goToDetailHandeler(index: number) {

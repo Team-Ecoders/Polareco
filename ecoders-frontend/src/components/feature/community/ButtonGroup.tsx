@@ -2,8 +2,6 @@ import { GoMoveToTop } from 'react-icons/go';
 import { styled } from 'styled-components';
 
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux/es/hooks/useSelector';
-import { user } from '../../../redux/slice/userSlice';
 
 interface positionSetting {
   left?: string;
@@ -11,7 +9,7 @@ interface positionSetting {
 }
 
 function ButtonGroup(props: positionSetting) {
-  const USERACCESSTOKEN = useSelector((state: user) => state.user.accessToken);
+  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
   const navigate = useNavigate();
 
   function moveToTopButtonClickHandler() {

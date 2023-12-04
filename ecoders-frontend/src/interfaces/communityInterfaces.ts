@@ -1,3 +1,12 @@
+//user
+export interface userState {
+  userName: string;
+  userId: string;
+  email: string;
+  profileImg: string;
+}
+
+//posts board
 export interface card {
   postId: number;
   title: string;
@@ -9,16 +18,8 @@ export interface card {
   likedByUserIds: Array<string>;
 }
 
-export interface comment {
-  memberId: string;
-  commentId: number;
-  content: string;
-  username: string;
-  createdAt: string;
-  updatedAt: null;
-}
-
-export interface postData {
+//post detail
+export interface postDataState {
   memberId: string;
   postId?: number;
   title?: string;
@@ -32,4 +33,13 @@ export interface postData {
   updatedAt?: string;
   comments?: Array<comment>;
   likedByUserIds?: Array<string>;
+}
+
+export interface comment {
+  memberId: string;
+  commentId: number;
+  content: string;
+  username: string;
+  createdAt: string;
+  updatedAt: null;
 }
