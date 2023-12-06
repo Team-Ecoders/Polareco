@@ -28,11 +28,11 @@ export interface postDataState {
   thumbnailUrl?: string;
   username?: string;
   views?: number;
-  likes?: number;
+  likes: number;
   createdAt?: string;
   updatedAt?: string;
-  comments?: Array<comment>;
-  likedByUserIds?: Array<string>;
+  comments: Array<comment>;
+  likedByUserIds: Array<string>;
 }
 
 export interface comment {
