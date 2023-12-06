@@ -48,14 +48,18 @@ function CommunityBoardPage() {
       searchKeyWord = `&keyword=${keyWord}`;
     }
     axios
-      .get(`${APIURL}/posts/all?lastPostId=${lastPostId}&size=${getPostCount}${searchKeyWord}`)
+      .get(`${APIURL}/posts/all?lastPostId=${lastPostId}&size=${getPostCount}${searchKeyWord}`, {
+        headers: {
+          //ngrok 사용시에만 넣음
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
       .then(function (response) {
         if (getPostCount === 20) {
           setPosts(response.data);
         } else {
           setPosts(prevData => [...prevData, ...response.data]);
         }
-
         if (response.data.length < getPostCount) {
           setlastPostId(0);
         } else {
