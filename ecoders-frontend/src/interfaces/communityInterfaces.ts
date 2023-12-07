@@ -43,3 +43,10 @@ export interface comment {
   createdAt: string;
   updatedAt: null;
 }
+
+export interface postWriteDataState {
+  title: string | undefined;
+  content: string | undefined;
+  thumbnailUrl: string | null;
+  category: string | undefined;
+}
