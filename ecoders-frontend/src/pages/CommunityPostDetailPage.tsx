@@ -29,15 +29,15 @@ import PostCommentDetail from '../components/feature/community/PostCommentDetail
 
 import { RootState } from '../redux/store/store';
 import { closeModal, openModal } from '../redux/slice/modalSlice';
+import { tokenExpirationHandler } from '../components/feature/user/Session';
+
 //vite로 만든 프로젝트에서 환경변수 사용하기
 const APIURL = import.meta.env.VITE_API_URL;
 
 function PostDetailHeaderButtons() {
-  // const USERID = useSelector((state: user) => state.user.userId);
   const POST = useSelector((state: RootState) => state.post);
-
-  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
-  const USERREFRESHTOKEN = localStorage.getItem('refreshtoken');
+  const USERACCESSTOKEN = localStorage.getItem('accessToken');
+  const USERREFRESHTOKEN = localStorage.getItem('refreshToken');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -101,8 +101,7 @@ function CommunityPostDetailPage() {
   const USERID = useSelector((state: RootState) => state.user.userId);
   const POST = useSelector((state: RootState) => state.post);
 
-  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
-  const USERREFRESHTOKEN = localStorage.getItem('refreshtoken');
+  const USERACCESSTOKEN = localStorage.getItem('accessToken');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -110,7 +109,6 @@ function CommunityPostDetailPage() {
 
   //post 정보 요청
   async function getPost() {
-    console.log(USERACCESSTOKEN);
     axios
       .get(`${APIURL}/posts/${params.postnumber}`, {
         headers: {
@@ -137,6 +135,27 @@ function CommunityPostDetailPage() {
       })
       .catch(function (error) {
         console.log(error);
+        if (error.response.status === 403) {
+          tokenExpirationHandler(getPost);
+        }
+      });
+  }
+
+  async function postLike() {
+    axios({
+      method: 'post',
+      url: `${APIURL}/posts/${POST.postId}/likes`,
+      headers: {
+        Authorization: `${USERACCESSTOKEN}`,
+      },
+    })
+      .then(() => {})
+      .catch(error => {
+        if (error.response.status === 403) {
+          tokenExpirationHandler(postLike);
+        } else {
+          console.log(error);
+        }
       });
   }
 
@@ -163,20 +182,7 @@ function CommunityPostDetailPage() {
         dispatch(setLikes(POST.likes + 1));
         dispatch(setLikedByUserIds([...POST.likedByUserIds, USERID]));
       }
-      axios({
-        method: 'post',
-        url: `${APIURL}/posts/${POST.postId}/likes`,
-        headers: {
-          Authorization: `${USERACCESSTOKEN}`,
-        },
-      })
-        .then(() => {})
-        .catch(error => {
-          console.log(error);
-          // if(error.response.status === 403){
-
-          // }
-        });
+      postLike();
     }
   }
   useEffect(() => {
@@ -287,10 +293,12 @@ const PostDetailContent = styled.div`
   border-radius: 15px;
   margin-bottom: 20px;
   img {
-    width: 100%;
-    height: 100%;
+    width: 65%;
     //이미지 사이즈
     object-fit: contain;
+    margin: auto;
+    padding: 10px 0;
+    display: block;
   }
 `;
 

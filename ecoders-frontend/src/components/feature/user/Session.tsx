@@ -40,7 +40,7 @@ export async function tokenExpirationHandler(fun: Function) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
-      alert('로그인을 다시 시도해주세요');
+      alert('로그인 후 시도해주세요');
 
       //로그아웃
       dispatch(logout());
@@ -57,8 +57,6 @@ function Session() {
   const dispatch = useDispatch();
   //로그인 상태 받아옴
   const isLoggedIn = useSelector((state: RootState) => state.login.isLoggedIn);
-
-  console.log('session');
   //유저 정보 받아오는 함수
   async function getUser() {
     const accessToken = localStorage.getItem('accessToken');

@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { FiX } from 'react-icons/fi';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store/store';
 
@@ -25,7 +25,7 @@ const CommentButtons = ({
   commentList: Array<comment>;
   setIsCommentModify: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
+  const USERACCESSTOKEN = localStorage.getItem('accessToken');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const dispatch = useDispatch();
@@ -120,7 +120,7 @@ function CommentModify({
   commentList: Array<comment>;
   setIsCommentModify: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
+  const USERACCESSTOKEN = localStorage.getItem('accessToken');
   const [comment, setComment] = useState(initComment.content);
 
   const dispatch = useDispatch();
@@ -195,11 +195,10 @@ function CommentModify({
 }
 
 function CommentAdd({ commentList, postid }: { commentList: Array<comment> | undefined; postid: number | undefined }) {
-  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
+  const USERACCESSTOKEN = localStorage.getItem('accessToken');
   const USERID = useSelector((state: RootState) => state.user.userId);
   const USERNAME = useSelector((state: RootState) => state.user.userName);
 
-  console.log(USERID);
   const dispatch = useDispatch();
 
   const [comment, setComment] = useState('');

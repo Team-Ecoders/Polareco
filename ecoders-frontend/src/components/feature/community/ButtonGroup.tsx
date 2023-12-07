@@ -2,6 +2,8 @@ import { GoMoveToTop } from 'react-icons/go';
 import { styled } from 'styled-components';
 
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store/store';
 
 interface positionSetting {
   left?: string;
@@ -9,16 +11,22 @@ interface positionSetting {
 }
 
 function ButtonGroup(props: positionSetting) {
-  const USERACCESSTOKEN = localStorage.getItem('accesstoken');
+  const USERACCESSTOKEN = localStorage.getItem('accessToken');
   const navigate = useNavigate();
+
+  const isLoggedIn = useSelector((state: RootState) => state.login.isLoggedIn);
 
   function moveToTopButtonClickHandler() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function conFirmLoginHandler() {
-    if (confirm('회원만 이용 가능한 기능입니다. 로그인 하시겠습니까?')) {
-      navigate(`/login`);
+    if (!isLoggedIn) {
+      if (confirm('회원만 이용 가능한 기능입니다. 로그인 하시겠습니까?')) {
+        navigate(`/login`);
+      }
+    } else {
+      navigate(`/community/postwrite`);
     }
   }
 
