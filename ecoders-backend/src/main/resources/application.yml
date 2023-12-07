@@ -39,6 +39,17 @@ spring:
           auth: true
           starttls:
             enable: true
+  # OAuth2 설정
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_OAUTH2_CLIENT_ID}
+            client-secret: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
   # 콘솔 로그에 색상 적용
   output:
     ansi:
