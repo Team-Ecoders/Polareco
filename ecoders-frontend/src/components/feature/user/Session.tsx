@@ -14,11 +14,11 @@ export async function tokenExpirationHandler(fun: Function) {
 
   try {
     // refreshToken으로 accessToken 재발급 시도
-    const response = await axios.get(`${APIURL}/token/reissue`, {
+    const response = await axios.post(`${APIURL}/token/reissue`, {
       headers: {
         'Refresh-Token': refreshToken,
         //ngrok 사용시에만 넣음
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
+        // 'ngrok-skip-browser-warning': 'skip-browser-warning',
       },
     });
 
