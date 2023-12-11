@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { closeModal, openModal } from '../redux/slice/modalSlice';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { login } from '../redux/slice/loginSlice';
 
 //vite로 만든 프로젝트에서 환경변수 사용하기
 const APIURL = import.meta.env.VITE_API_URL;
@@ -220,8 +221,11 @@ function Signup() {
           params: data,
           headers: {
             'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
           },
         });
+
+        console.log(response);
 
         if (response.status === 401) {
           setErrors({ ...errors, confirmEmail: '유효하지 않은 코드입니다.' });
@@ -272,6 +276,37 @@ function Signup() {
           dispatch(openModal('signupModal'));
         }
       } catch (err: any) {
+        console.log(err);
+      }
+    }
+  };
+
+  const googleLoginHandler = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await axios.get(`${APIURL}/oauth2/authentication/google`, {
+        headers: {
+          //ngrok 사용시에만 넣음
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      });
+
+      if (response.status === 200) {
+        // 1. 로컬에 토큰 저장
+        const accessToken = response.data['accessToken'];
+        const refreshToken = response.data['refreshToken'];
+
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+
+        // 2. 로그인 전역 상태 변경
+        dispatch(login());
+
+        // 3. 홈(메인)으로 이동
+        navigate('/');
+      }
+    } catch (err: any) {
+      if (err.response.status === 401) {
         console.log(err);
       }
     }
@@ -449,7 +484,7 @@ function Signup() {
                     </div>
                   </div>
                 </SignUpModal>
-                <SubmitButtonGoogle className="google-login-submit">
+                <SubmitButtonGoogle className="google-login-submit" onClick={googleLoginHandler}>
                   <GoogleLogo src={googleicon} />
                   Sign up with google
                 </SubmitButtonGoogle>

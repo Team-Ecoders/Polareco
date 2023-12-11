@@ -34,7 +34,10 @@ function ResetPasswordPage() {
       console.log(email);
       console.log(token);
       try {
-        const response = await axios.get(`${APIURL}/password/forgot/verification`, { params: data });
+        const response = await axios.get(`${APIURL}/password/forgot/verification`, {
+          params: data,
+          headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
+        });
         if (response.status === 200) {
           console.log('유효한 토큰!');
         }

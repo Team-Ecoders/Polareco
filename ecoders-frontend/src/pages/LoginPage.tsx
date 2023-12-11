@@ -90,6 +90,28 @@ function LoginPage() {
     }
   };
 
+  const resetPwHandler = async (data: { email: string }) => {
+    try {
+      const response = await axios.post(`${APIURL}/password/forgot/issue`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      //회원 정보 있고, 비밀번호 이메일이 발송된 경우
+      //구글이면, 모달 하나 더 띄우고 -> 여기서 yes 누르면
+      if (response.status === 200) {
+        dispatch(closeModal('findPwModal'));
+        dispatch(openModal('sandingPwModal'));
+        navigate('/');
+      }
+    } catch (err: any) {
+      //가입한 적 없는 이메일로 pw 찾으려고 하는 경우
+      if (err.response.status === 404) {
+        setFindPwError('해당 이메일로 가입한 회원정보가 없습니다.');
+      }
+    }
+  };
+
   //이메일 유효성 검사 추가
   const findPwHandler = async (e: any) => {
     e.preventDefault();
@@ -101,23 +123,56 @@ function LoginPage() {
     } else {
       setFindPwError('');
       const data = { email: findPwEmail };
+      //구글인지 아닌지 요청
       try {
-        const response = await axios.post(`${APIURL}/password/forgot/issue`, data, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        const response = await axios.get(`${APIURL}/check/google`, {
+          params: data,
+          headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
         });
-        //회원 정보 있고, 비밀번호 이메일이 발송된 경우
-        if (response.status === 200) {
-          dispatch(closeModal('findPwModal'));
-          dispatch(openModal('sandingPwModal'));
-          navigate('/');
+        console.log(response);
+        if (response.data.isGoogleMember) {
+          const checkReset = confirm('구글로 가입한 회원입니다. 비밀번호를 설정하시겠습니까?');
+          if (checkReset) {
+            resetPwHandler(data);
+          } else {
+            navigate('/');
+          }
+        } else {
+          resetPwHandler(data);
         }
       } catch (err: any) {
-        //가입한 적 없는 이메일로 pw 찾으려고 하는 경우
-        if (err.response.status === 404) {
-          setFindPwError('해당 이메일로 가입한 회원정보가 없습니다.');
-        }
+        console.log(err);
+      }
+    }
+  };
+
+  const googleLoginHandler = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await axios.get(`${APIURL}/oauth2/authentication/google`, {
+        headers: {
+          //ngrok 사용시에만 넣음
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      });
+      if (response.status === 200) {
+        // 1. 로컬에 토큰 저장
+        const accessToken = response.data['accessToken'];
+        const refreshToken = response.data['refreshToken'];
+
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+
+        // 2. 로그인 전역 상태 변경
+        dispatch(login());
+
+        // 3. 홈(메인)으로 이동
+        navigate('/');
+      }
+    } catch (err: any) {
+      if (err.response.status === 401) {
+        //403
+        setError('아이디 / 이메일 또는 비밀번호가 잘못되었습니다.');
       }
     }
   };
@@ -192,7 +247,7 @@ function LoginPage() {
                 <SubmitButton className="login-submit" onClick={loginHandler}>
                   Log in
                 </SubmitButton>
-                <SubmitButtonGoogle className="google-login-submit">
+                <SubmitButtonGoogle className="google-login-submit" onClick={googleLoginHandler}>
                   <GoogleLogo src={googleicon} />
                   Sign up with google
                 </SubmitButtonGoogle>
