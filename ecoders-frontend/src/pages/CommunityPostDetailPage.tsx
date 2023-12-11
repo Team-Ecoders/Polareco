@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../redux/slice/loginSlice';
 
 import {
   setCategory,
@@ -53,7 +54,6 @@ function PostDetailHeaderButtons() {
       .delete(`${APIURL}/posts/${POST.postId}`, {
         headers: {
           Authorization: `${USERACCESSTOKEN}`,
-          'Refresh-Token': `${USERREFRESHTOKEN}`,
         },
       })
       .then(function () {
@@ -62,8 +62,12 @@ function PostDetailHeaderButtons() {
         navigate(`/community`);
       })
       .catch(function (error) {
-        //console.log('게시물 삭제 실패');
-        console.log(error);
+        if (error.response.status === 403) {
+          tokenExpirationHandler(postDeleteHandler);
+        } else {
+          console.log(error);
+          dispatch(logout());
+        }
       });
   }
 
@@ -134,9 +138,12 @@ function CommunityPostDetailPage() {
         dispatch(setViews(response.data.views));
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
         if (error.response.status === 403) {
+          console.log(error);
           tokenExpirationHandler(getPost);
+        } else {
+          dispatch(logout());
         }
       });
   }
@@ -154,6 +161,22 @@ function CommunityPostDetailPage() {
         if (error.response.status === 403) {
           tokenExpirationHandler(postLike);
         } else {
+          if (POST.likedByUserIds?.includes(USERID)) {
+            //좋취가 실패함 -> 따라서 좋아요 개수 늘리고, 좋아요 유저 아이디 유지
+            dispatch(setLikes(POST.likes));
+            dispatch(setLikedByUserIds([...POST.likedByUserIds, USERID]));
+          } else {
+            //좋추가 실패함 -> 따라서 좋아요 개수 줄이고, 좋아요 유저 아이디에서도 제거
+            dispatch(setLikes(POST.likes));
+            dispatch(
+              setLikedByUserIds(
+                POST.likedByUserIds.filter((item: string) => {
+                  item !== USERID;
+                }),
+              ),
+            );
+          }
+          dispatch(logout());
           console.log(error);
         }
       });

@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store/store';
 
+import { logout } from '../../../redux/slice/loginSlice';
+
 import { comment } from '../../../interfaces/communityInterfaces';
 // import { useNavigate } from 'react-router-dom';
 import { setComments } from '../../../redux/slice/postSlice';
@@ -55,10 +57,12 @@ const CommentButtons = ({
         console.log(response.status);
       })
       .catch(function (error) {
-        //console.log('댓글 삭제 실패');
-        //accessToken만료일 경우..!
-        if (error.resopnse.status === 403) {
+        if (error.response.status === 403) {
           tokenExpirationHandler(commentDeleteHandler);
+        } else {
+          console.log(error);
+          dispatch(setComments(commentList));
+          dispatch(logout());
         }
       });
   }
@@ -128,6 +132,33 @@ function CommentModify({
   function changeCommentHandler(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setComment((event.target as HTMLTextAreaElement).value);
   }
+
+  async function patchComment(patchCommentData: { content: string }) {
+    axios({
+      method: 'patch',
+      url: `${APIURL}/posts/comment/${initComment.commentId}`,
+      data: JSON.stringify(patchCommentData),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${USERACCESSTOKEN}`,
+      },
+    })
+      .then(function () {
+        //console.log('댓글 수정 성공');
+        setIsCommentModify(0);
+        // window.location.reload();
+      })
+      .catch(error => {
+        if (error.response.status === 403) {
+          tokenExpirationHandler(submitCommentHandler);
+        } else {
+          console.log(error);
+          //댓글 수정 실패 시 댓글 이전으로 다시 설정
+          dispatch(setComments(commentList));
+          dispatch(logout());
+        }
+      });
+  }
   // 댓글 수정 버튼 클릭 함수
   function submitCommentHandler() {
     //console.log(comment);
@@ -154,27 +185,7 @@ function CommentModify({
         });
         dispatch(setComments(modifyCommentList));
       }
-      axios({
-        method: 'patch',
-        url: `${APIURL}/posts/comment/${initComment.commentId}`,
-        data: JSON.stringify(commentData),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${USERACCESSTOKEN}`,
-        },
-      })
-        .then(function () {
-          //console.log('댓글 수정 성공');
-          setIsCommentModify(0);
-          // window.location.reload();
-        })
-        .catch(error => {
-          console.log(error);
-          if (error.resopnse.status === 403) {
-            tokenExpirationHandler(submitCommentHandler);
-          }
-          //console.log('댓글 수정 실패');
-        });
+      patchComment(commentData);
     }
   }
   return (
@@ -217,6 +228,47 @@ function CommentAdd({ commentList, postid }: { commentList: Array<comment> | und
   function changeCommentHandler(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setComment((event.target as HTMLTextAreaElement).value);
   }
+
+  async function postComment(commentData: { content: string }) {
+    axios({
+      method: 'post',
+      url: `${APIURL}/posts/${postid}/comment`,
+      data: JSON.stringify(commentData),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${USERACCESSTOKEN}`,
+      },
+    })
+      .then(response => {
+        console.log(response.data.commentId);
+        if (commentList !== undefined) {
+          dispatch(
+            setComments([
+              ...commentList,
+              {
+                memberId: USERID,
+                commentId: response.data.commentId,
+                content: comment,
+                username: USERNAME,
+                createdAt: `${dateString} ${timeString}`,
+                updatedAt: null,
+              },
+            ]),
+          );
+          setComment('');
+        }
+      })
+      .catch(error => {
+        if (error.response.status === 403) {
+          tokenExpirationHandler(postComment);
+        } else {
+          console.log(error);
+          //댓글 등록 실패 시 댓글 이전으로 다시 설정
+          setComments(commentList);
+          dispatch(logout());
+        }
+      });
+  }
   // 댓글 등록 버튼 클릭 함수
   function submitCommentHandler() {
     const commentData = {
@@ -249,40 +301,7 @@ function CommentAdd({ commentList, postid }: { commentList: Array<comment> | und
         setComment('');
       }
 
-      axios({
-        method: 'post',
-        url: `${APIURL}/posts/${postid}/comment`,
-        data: JSON.stringify(commentData),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${USERACCESSTOKEN}`,
-        },
-      })
-        .then(response => {
-          //console.log('댓글 등록 성공');
-          console.log(response.data.commentId);
-
-          if (commentList !== undefined) {
-            dispatch(
-              setComments([
-                ...commentList,
-                {
-                  memberId: USERID,
-                  commentId: response.data.commentId,
-                  content: comment,
-                  username: USERNAME,
-                  createdAt: `${dateString} ${timeString}`,
-                  updatedAt: null,
-                },
-              ]),
-            );
-            setComment('');
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          //console.log('댓글 등록 실패');
-        });
+      postComment(commentData);
     }
   }
   return (

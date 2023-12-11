@@ -139,18 +139,16 @@ function CommunityBoardPage() {
           <div className="board-header-btn-container">
             {categoryOption.map((item, index) => {
               return (
-                <>
-                  <Button
-                    key={index}
-                    className={category === item ? 'clicked-category' : ''}
-                    width="70px"
-                    fontSize={1}
-                    hoverBgColor="#7092bf"
-                    hoverColor="white"
-                    onClick={changeCategoryHandler}>
-                    {item}
-                  </Button>
-                </>
+                <Button
+                  key={index}
+                  className={category === item ? 'clicked-category' : ''}
+                  width="70px"
+                  fontSize={1}
+                  hoverBgColor="#7092bf"
+                  hoverColor="white"
+                  onClick={changeCategoryHandler}>
+                  {item}
+                </Button>
               );
             })}
           </div>

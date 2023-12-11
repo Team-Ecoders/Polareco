@@ -1,8 +1,9 @@
 import { styled } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { closeModal, openModal } from '../redux/slice/modalSlice';
+import { logout } from '../redux/slice/loginSlice';
 
 import { Editor } from '@toast-ui/react-editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
@@ -16,7 +17,7 @@ import { postWriteDataState } from '../interfaces/communityInterfaces';
 import { tokenExpirationHandler } from '../components/feature/user/Session';
 
 import axios from 'axios';
-import { RootState } from '../redux/store/store';
+// import { RootState } from '../redux/store/store';
 
 //vite로 만든 프로젝트에서 환경변수 사용하기
 const APIURL = import.meta.env.VITE_API_URL;
@@ -34,7 +35,7 @@ function CommunityPostWritePage() {
   const [content, setContent] = useState<string | undefined>('');
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>('');
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModify, setIsModify] = useState<boolean>(false);
 
   const editorRef = useRef<Editor>(null);
@@ -71,6 +72,7 @@ function CommunityPostWritePage() {
           tokenExpirationHandler(postWrite);
         } else {
           console.log(error);
+          dispatch(logout());
         }
       });
   }
