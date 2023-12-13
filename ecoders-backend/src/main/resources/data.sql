@@ -1,0 +1,17 @@
+insert into missions values(2, '빨래 모아서 세탁하기');
+insert into missions values(1, '사용하지 않는 전자제품 플러그 뽑기');
+insert into missions values(4, '여름철 실내 적정 온도 26도 유지하기');
+insert into missions values(5, '사용하지 않는 조명 소등하기');
+insert into missions values(6, '대중교통 이용하기');
+insert into missions values(7, '가까운 거리 걷기나 달리기');
+insert into missions values(8, '읽지 않는 뉴스레터 구독 취소하기');
+insert into missions values(9, '불필요한 메일 삭제하기');
+insert into missions values(10, '텀블러 사용하기');
+insert into missions values(11, '장바구니 사용하기');
+insert into missions values(12, '화면 밝기 줄이기');
+insert into missions values(13, '영상 자동 재생 끄기');
+insert into missions values(14, '유튜브 시청 시간 줄이고 다른 활동하기');
+insert into missions values(15, '배달보다 포장하기');
+insert into missions values(16, '자가용보다 공공자전거 이용하기');
+insert into missions values(17, '샤워 빨리하기(샤워에 집중)');
+insert into missions values(3, '에어컨 필터 청소하기');

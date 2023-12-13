@@ -20,6 +20,7 @@ public enum ExceptionCode {
     REFRESH_TOKEN_INVALID(FORBIDDEN, "Refresh token invalid"),
     REFRESH_TOKEN_NOT_FOUND(NOT_FOUND, "Refresh token not found");
 
+
     private final HttpStatus httpStatus;
 
     private final String message;
