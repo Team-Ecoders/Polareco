@@ -23,7 +23,13 @@ public enum ExceptionCode {
     PASSWORD_RESET_TOKEN_NOT_FOUND(NOT_FOUND, "Password reset token not found"),
     PASSWORD_RESET_TOKEN_MISMATCH(FORBIDDEN, "Password reset token mismatch"),
     PASSWORD_MISMATCH(FORBIDDEN, "Password mismatch"),
-    IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "Image upload failed");
+    IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "Image upload failed"),
+    POST_NOT_FOUND(NOT_FOUND, "Post not found"),
+    CANNOT_CHANGE_POST(FORBIDDEN, "Post cannot change"),
+    CANNOT_DELETE_POST(FORBIDDEN, "Post cannot delete"),
+    COMMENT_NOT_FOUND(NOT_FOUND, "Comment not found"),
+    CANNOT_CHANGE_COMMENT(FORBIDDEN, "Comment cannot change"),
+    CANNOT_DELETE_COMMENT(FORBIDDEN, "Comment cannot delete");
 
 
     private final HttpStatus httpStatus;
