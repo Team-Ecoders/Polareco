@@ -31,6 +31,7 @@ public enum ExceptionCode {
     CANNOT_CHANGE_COMMENT(FORBIDDEN, "Comment cannot change"),
     CANNOT_DELETE_COMMENT(FORBIDDEN, "Comment cannot delete");
 
+
     private final HttpStatus httpStatus;
 
     private final String message;
