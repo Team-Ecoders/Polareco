@@ -14,7 +14,7 @@ import {
   setLikedByUserIds,
   setLikes,
   setMemberId,
-  setPost,
+  // setPost,
   setPostId,
   setThumbnailUrl,
   setTitle,
@@ -38,7 +38,7 @@ const APIURL = import.meta.env.VITE_API_URL;
 function PostDetailHeaderButtons() {
   const POST = useSelector((state: RootState) => state.post);
   const USERACCESSTOKEN = localStorage.getItem('accessToken');
-  const USERREFRESHTOKEN = localStorage.getItem('refreshToken');
+  // const USERREFRESHTOKEN = localStorage.getItem('refreshToken');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
