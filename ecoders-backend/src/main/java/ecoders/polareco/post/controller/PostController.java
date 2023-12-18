@@ -1,6 +1,7 @@
 package ecoders.polareco.post.controller;
 
 import ecoders.polareco.auth.jwt.service.JwtService;
+import ecoders.polareco.aws.service.S3Service;
 import ecoders.polareco.error.exception.BusinessLogicException;
 import ecoders.polareco.error.exception.ExceptionCode;
 import ecoders.polareco.member.entity.Member;
@@ -13,7 +14,6 @@ import ecoders.polareco.post.repository.CommentRepository;
 import ecoders.polareco.post.repository.PostRepository;
 import ecoders.polareco.post.service.CommentService;
 import ecoders.polareco.post.service.PostService;
-import ecoders.polareco.s3.S3Service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -82,7 +82,7 @@ public class PostController {
     public ResponseEntity<String> uploadImage(@RequestHeader("Content-Type") String contentType,
                                               @RequestParam("imageFile") MultipartFile imageFile){
         try{
-        String imageUrl = s3Service.uploadImage(imageFile);
+        String imageUrl = s3Service.uploadImage(imageFile, S3Service.ImageType.POST);
         return ResponseEntity.ok(imageUrl);
     } catch (Exception e){
         e.printStackTrace();
