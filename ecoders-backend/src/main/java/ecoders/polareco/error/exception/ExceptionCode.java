@@ -18,7 +18,12 @@ public enum ExceptionCode {
     JWT_EXPIRED(FORBIDDEN, "JWT expired"),
     JWT_INVALID(FORBIDDEN, "JWT invalid"),
     REFRESH_TOKEN_INVALID(FORBIDDEN, "Refresh token invalid"),
-    REFRESH_TOKEN_NOT_FOUND(NOT_FOUND, "Refresh token not found");
+    REFRESH_TOKEN_NOT_FOUND(NOT_FOUND, "Refresh token not found"),
+    MAIL_MESSAGING_FAILED(INTERNAL_SERVER_ERROR, "Mail messaging failed"),
+    PASSWORD_RESET_TOKEN_NOT_FOUND(NOT_FOUND, "Password reset token not found"),
+    PASSWORD_RESET_TOKEN_MISMATCH(FORBIDDEN, "Password reset token mismatch"),
+    PASSWORD_MISMATCH(FORBIDDEN, "Password mismatch"),
+    IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "Image upload failed");
 
     private final HttpStatus httpStatus;
 

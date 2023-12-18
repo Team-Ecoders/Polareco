@@ -7,6 +7,18 @@ jwt:
   access-token-expiration-hours: 1
   refresh-token-expiration-hours: 168
   secret-key: ${JWT_SECRET_KEY}
+# AWS 관련 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_IAM_ACCESS_KEY}
+      secret-key: ${AWS_IAM_SECRET_KEY}
+    s3:
+      bucket: polareco-deploy
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 spring:
   # JPA 쿼리문 로그 출력 여부 및 형식 설정
   jpa:
@@ -20,12 +32,28 @@ spring:
     port: 587
     username: ${SMTP_GMAIL_USERNAME}
     password: ${SMTP_GMAIL_PASSWORD}
+    default-encoding: UTF-8
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+  # Redis 설정
+  redis:
+    host: redis
+    port: 6379
+  # OAuth2 설정
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_OAUTH2_CLIENT_ID}
+            client-secret: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
   # 콘솔 로그에 색상 적용
   output:
     ansi:
