@@ -214,13 +214,11 @@ function Signup() {
     } else {
       const data = {
         email: formData.email,
-        confirmEmail: formData.confirmEmail,
+        verificationCode: formData.confirmEmail,
       };
       try {
-        const response = await axios.get(`${APIURL}/signup/code/verification`, {
-          params: data,
+        const response = await axios.post(`${APIURL}/signup/code/verification`, data, {
           headers: {
-            'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'skip-browser-warning',
           },
         });

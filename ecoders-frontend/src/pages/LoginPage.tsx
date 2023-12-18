@@ -102,7 +102,6 @@ function LoginPage() {
       if (response.status === 200) {
         dispatch(closeModal('findPwModal'));
         dispatch(openModal('sandingPwModal'));
-        navigate('/');
       }
     } catch (err: any) {
       //가입한 적 없는 이메일로 pw 찾으려고 하는 경우

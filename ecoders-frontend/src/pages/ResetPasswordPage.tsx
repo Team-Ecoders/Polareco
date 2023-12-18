@@ -24,30 +24,30 @@ function ResetPasswordPage() {
   const email = params.get('email');
   const token = params.get('token');
 
+  async function confirmToken() {
+    const data = {
+      email: email,
+      token: token,
+    };
+    console.log(email);
+    console.log(token);
+    try {
+      const response = await axios.post(`${APIURL}/password/forgot/verification`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.status === 200) {
+        console.log('유효한 토큰!');
+      }
+    } catch (err: any) {
+      console.log('만료된 토큰!');
+      console.log(err);
+      navigate('/error');
+    }
+  }
   useEffect(() => {
     //유효한 토큰인지 검사
-    async function confirmToken() {
-      const data = {
-        email: email,
-        token: token,
-      };
-      console.log(email);
-      console.log(token);
-      try {
-        const response = await axios.get(`${APIURL}/password/forgot/verification`, {
-          params: data,
-          headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
-        });
-        if (response.status === 200) {
-          console.log('유효한 토큰!');
-        }
-      } catch (err: any) {
-        //재등록 실패 시... 토큰 만료..........?
-        console.log('만료된 토큰!');
-        navigate('/error');
-      }
-    }
-
     confirmToken();
   }, []);
 
@@ -76,6 +76,7 @@ function ResetPasswordPage() {
 
   const setNewPasswordHandler = async (e: any) => {
     e.preventDefault();
+
     if (formData.newPassword != formData.confirmNewPassword) {
       setErrors({ ...errors, confirmPassword: '비밀번호가 일치하지 않습니다.' });
       return;
