@@ -13,19 +13,5 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
-  # Redis 설정
-  redis:
-    host: localhost
-    port: 6379
-cloud:
-  aws:
-    credentials:
-      accessKey: ${AWS_IAM_AccessKey}
-      secretKey: ${AWS_IAM_SecretKey}
-    s3:
-      bucket: polareco-deploy
-      dir: images/post
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
+# 프론트엔드 URL (로컬)
+client-url: http://localhost:5173
