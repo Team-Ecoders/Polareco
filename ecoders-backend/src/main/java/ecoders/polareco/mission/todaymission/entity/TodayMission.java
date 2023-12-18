@@ -4,7 +4,6 @@ import ecoders.polareco.auditing.AuditableEntity;
 import ecoders.polareco.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.redis.core.TimeToLive;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

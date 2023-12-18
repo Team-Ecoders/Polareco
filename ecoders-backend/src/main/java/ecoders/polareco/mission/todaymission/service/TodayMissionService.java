@@ -1,9 +1,8 @@
 package ecoders.polareco.mission.todaymission.service;
 
-import ecoders.polareco.member.entity.Member;
 import ecoders.polareco.member.service.MemberService;
 import ecoders.polareco.mission.todaymission.dto.response.TodayMissionListResponse;
-import ecoders.polareco.mission.todaymission.entity.Mission;
+import ecoders.polareco.mission.todaymission.entity.Missions;
 import ecoders.polareco.mission.todaymission.entity.TodayMission;
 import ecoders.polareco.mission.todaymission.repository.MissionsRepository;
 import ecoders.polareco.mission.todaymission.repository.TodayMissionRepository;
@@ -11,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,70 +34,56 @@ public class TodayMissionService {
     /**
      * 오늘의 미션 가져오기
      */
+
     @Transactional
-    public List<TodayMissionListResponse> getTodayMissions(UUID uuid) {
+    public List<TodayMissionListResponse> getTodayMissions(UUID uuid, int count) {
 
-        List<Mission> randomMissions = missionsRepository.findRandomMissions();
+        List<TodayMission> list = todayMissionRepository.findAll();
 
-        return randomMissions
+        if (list.isEmpty()) {
+            List<Long> todayMissionIds = getTodayMissionId(count);
+            for (Long missionId : todayMissionIds) {
+                todayMissionRepository.save(TodayMission.builder()
+                        .content("mission")
+                        .completed(false)
+                        .id(missionId)
+                        .build());
+            }
+        }
+
+        return list
                 .stream()
                 .map(mission -> new TodayMissionListResponse(
                         mission.getId(),
-                        mission.getContent()
+                        mission.getContent(),
+                        mission.getCompleted()
                 )).collect(Collectors.toList());
-
     }
 
+    /**
+     * 오늘의 미션 id 랜덤으로 가져오기 위한 메서드
+     */
+    @Transactional
+    public List<Long> getTodayMissionId(int count) {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            List<Missions> missionIdList = missionsRepository.findAll();
+            List<Long> todayMissionsId = new ArrayList<>();
 
-//    @Transactional
-//    public List<TodayMissionListResponse> getTodayMissions(UUID uuid, int count) {
-//
-//        List<TodayMission> list = todayMissionRepository.findAll();
-//
-//        if (list.isEmpty()) {
-//            List<Long> todayMissionIds = getTodayMissionId(count);
-//            for (Long missionId : todayMissionIds) {
-//                todayMissionRepository.save(TodayMission.builder()
-//                        .content("mission")
-//                        .completed(false)
-//                        .id(missionId)
-//                        .build());
-//            }
-//        }
-//
-//        return list
-//                .stream()
-//                .map(mission -> new TodayMissionListResponse(
-//                        mission.getId(),
-//                        mission.getContent(),
-//                        mission.getCompleted()
-//                )).collect(Collectors.toList());
-//    }
+            Random random = new Random(now.getDayOfYear());
 
-//    /**
-//     * 오늘의 미션 id 랜덤으로 가져오기 위한 메서드
-//     */
-//    @Transactional
-//    public List<Long> getTodayMissionId(int count) {
-//        try {
-//            LocalDateTime now = LocalDateTime.now();
-//            List<TodayMission> missionIdList = missionsRepository.findAll();
-//            List<Long> todayMissionsId = new ArrayList<>();
-//
-//            Random random = new Random(now.getDayOfYear());
-//
-//            for (int i = 0; i < count; i++) {
-//                if (!missionIdList.isEmpty()) {
-//                    int id = random.nextInt(missionIdList.size());
-//                    while (todayMissionsId.contains(missionIdList.get(id).getId())) {
-//                        id = random.nextInt(missionIdList.size());
-//                    }
-//                    todayMissionsId.add(missionIdList.get(id).getId());
-//                }
-//            }
-//            return todayMissionsId;
-//        } catch (Exception e) {
-//            throw new RuntimeException("데이터베이스 오류");
-//        }
-//    }
+            for (int i = 0; i < count; i++) {
+                if (!missionIdList.isEmpty()) {
+                    int id = random.nextInt(missionIdList.size());
+                    while (todayMissionsId.contains(missionIdList.get(id).getId())) {
+                        id = random.nextInt(missionIdList.size());
+                    }
+                    todayMissionsId.add(missionIdList.get(id).getId());
+                }
+            }
+            return todayMissionsId;
+        } catch (Exception e) {
+            throw new RuntimeException("데이터베이스 오류");
+        }
+    }
 }

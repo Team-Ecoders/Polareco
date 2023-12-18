@@ -8,10 +8,10 @@ public class TodayMissionListResponse {
     private String text;
     private boolean completed;
 
-    public TodayMissionListResponse(Long todayMissionId, String text) {
+    public TodayMissionListResponse(Long todayMissionId, String text, boolean completed) {
         this.todayMissionId = todayMissionId;
         this.text = text;
-//        this.completed = completed;
+        this.completed = completed;
     }
 }
 

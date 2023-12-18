@@ -1,6 +1,5 @@
 package ecoders.polareco.mission.todaymission.repository;
 
-import ecoders.polareco.member.entity.Member;
 import ecoders.polareco.mission.todaymission.entity.TodayMission;
 import org.springframework.data.jpa.repository.JpaRepository;
 

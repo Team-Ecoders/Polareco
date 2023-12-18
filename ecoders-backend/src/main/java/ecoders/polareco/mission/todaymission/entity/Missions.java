@@ -1,14 +1,15 @@
 package ecoders.polareco.mission.todaymission.entity;
 
-import ecoders.polareco.auditing.AuditableEntity;
 import lombok.Getter;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+@Entity
 @Getter
-public class Mission extends AuditableEntity {
+public class Missions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,4 +17,11 @@ public class Mission extends AuditableEntity {
 
     private String content;
 
+    public Missions() {
+    }
+
+    public Missions(Long id, String content) {
+        this.id = id;
+        this.content = content;
+    }
 }
