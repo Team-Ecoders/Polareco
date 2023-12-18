@@ -67,20 +67,20 @@ public class MemberService {
         eventPublisher.publishEvent(new PasswordResetTokenIssueEvent(clientUrl, member.getEmail(), token));
     }
 
-    public void verifyPasswordResetToken(String email, String token) {
-        String savedToken = redisService.getPasswordResetToken(email);
-        if (!savedToken.equals(token)) {
-            throw new BusinessLogicException(ExceptionCode.PASSWORD_RESET_TOKEN_MISMATCH);
-        }
-        redisService.deletePasswordResetToken(email);
-    }
-
     public void resetPassword(String email, String token, String newPassword) {
         Member member = findMemberByEmail(email);
         verifyPasswordResetToken(member.getEmail(), token);
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         member.setPassword(encodedNewPassword);
         memberRepository.save(member);
+        redisService.deletePasswordResetToken(email);
+    }
+
+    public void verifyPasswordResetToken(String email, String token) {
+        String savedToken = redisService.getPasswordResetToken(email);
+        if (!savedToken.equals(token)) {
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_RESET_TOKEN_MISMATCH);
+        }
     }
 
     public String updateProfileImage(String email, MultipartFile imageFile) {
@@ -114,5 +114,10 @@ public class MemberService {
             log.error("Member corresponding to the email already exists : {}", email);
             throw new BusinessLogicException(ExceptionCode.MEMBER_ALREADY_EXISTS);
         }
+    }
+
+    public boolean checkIsGoogleMember(String email) {
+        Member member = findMemberByEmail(email);
+        return !member.hasPassword();
     }
 }

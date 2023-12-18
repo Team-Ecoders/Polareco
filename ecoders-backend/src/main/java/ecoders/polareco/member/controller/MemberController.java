@@ -25,7 +25,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/signup/code/verification")
+    @PostMapping("/signup/code/verification")
     public ResponseEntity<?> verifyEmail(@RequestBody @Valid EmailVerificationCodeDto emailVerificationCodeDto) {
         String email = emailVerificationCodeDto.getEmail();
         String verificationCode = emailVerificationCodeDto.getVerificationCode();
@@ -51,7 +51,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/password/forgot/verification")
+    @PostMapping("/password/forgot/verification")
     public ResponseEntity<?> verifyPasswordResetToken(@RequestBody PasswordResetVerificationDto dto) {
         memberService.verifyPasswordResetToken(dto.getEmail(), dto.getToken());
         return ResponseEntity.ok().build();
@@ -79,5 +79,12 @@ public class MemberController {
     ) {
         memberService.updatePassword(email, passwordUpdateDto.getCurrentPassword(), passwordUpdateDto.getNewPassword());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/check/google")
+    public ResponseEntity<?> checkIsGoogleMember(@RequestParam("email") String email) {
+        boolean isGoogleMember = memberService.checkIsGoogleMember(email);
+        GoogleMemberCheckResponse response = new GoogleMemberCheckResponse(isGoogleMember);
+        return ResponseEntity.ok(response);
     }
 }
