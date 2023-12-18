@@ -14,6 +14,9 @@ const initialState: ModalState = {
     sandingPwModal: false,
     setNewPwModal: false,
     loginModal: false,
+    postModal: false,
+    deletePostModal: false,
+    deleteCommentModal: false,
   },
 };
 
