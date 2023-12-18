@@ -39,6 +39,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  # Redis 설정
+  redis:
+    host: redis
+    port: 6379
   # OAuth2 설정
   security:
     oauth2:
