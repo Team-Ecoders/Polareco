@@ -58,8 +58,10 @@ public class Post extends AuditableEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-   @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-   private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
 
 }
+

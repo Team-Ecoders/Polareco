@@ -18,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -93,10 +90,11 @@ public class PostController {
 
 
     @GetMapping("/{post-id}")
-   public ResponseEntity<PostDto.PostResponseDtoV1> getPost(@PathVariable("post-id") long postId,
-                                                            @AuthenticationPrincipal String email) {
+
+    public ResponseEntity<PostDto.PostResponseDtoV1> getPost(@PathVariable("post-id") long postId,
+                                                             @AuthenticationPrincipal String email) {
         PostDto.PostResponseDtoV1 foundPost = postService.getPost(postId);
-        if (!email.isEmpty()) {
+        if (email != null && !email.isEmpty() && !email.equals("anonymousUser")) {
             Member member = postService.findMemberByEmail(email);
             String memberId = member.getUuid().toString();
             postService.updateView(postId, memberId);
@@ -113,7 +111,9 @@ public class PostController {
 
     @PatchMapping("/{post-id}")
     public ResponseEntity patchPost(@PathVariable("post-id") @Positive long postId,
-                                      @RequestBody PostDto.PostUpdateDto postDto,
+
+                                    @RequestBody PostDto.PostUpdateDto postDto,
+
                                     @AuthenticationPrincipal String email)
     {
         Post newPost = postService.updatePost(postId, email);
@@ -194,4 +194,6 @@ public class PostController {
 
 
 
+
 }
+

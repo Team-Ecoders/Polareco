@@ -18,4 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p WHERE p.postId < :lastPostId AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword1%) ORDER BY p.postId DESC")
     Page<Post> findByPostIdLessThanAndTitleContainingOrContentContainingOrderByPostIdDesc(Long lastPostId, String keyword, String keyword1, PageRequest pageRequest);
+
 }
+

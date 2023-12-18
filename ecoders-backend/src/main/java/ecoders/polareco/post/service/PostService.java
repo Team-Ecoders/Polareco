@@ -1,6 +1,5 @@
 package ecoders.polareco.post.service;
 
-import com.amazonaws.services.s3.AmazonS3;
 import ecoders.polareco.error.exception.BusinessLogicException;
 import ecoders.polareco.error.exception.ExceptionCode;
 import ecoders.polareco.member.entity.Member;
@@ -17,9 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -216,4 +212,6 @@ public class PostService {
         LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
         return ChronoUnit.SECONDS.between(now, midnight);
     }
+
 }
+
