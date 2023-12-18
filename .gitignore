@@ -33,8 +33,9 @@ ecoders-backend/build/
 ecoders-backend/Dockerfile
 
 ### IntelliJ IDEA ###
-.idea
 ecoders-backend/.idea
+ecoders-backend/docker-compose.yml
+ecoders-backend/.env
 *.iws
 *.iml
 *.ipr
