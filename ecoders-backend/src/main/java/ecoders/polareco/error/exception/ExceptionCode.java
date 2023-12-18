@@ -25,6 +25,7 @@ public enum ExceptionCode {
     PASSWORD_MISMATCH(FORBIDDEN, "Password mismatch"),
     IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "Image upload failed");
 
+
     private final HttpStatus httpStatus;
 
     private final String message;
