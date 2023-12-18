@@ -30,7 +30,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         HttpServletResponse response,
         Authentication authentication
     ) throws IOException, ServletException {
+        log.info("Authentication 객체: {}", authentication);
         Member member = ((PolarecoUserDetails) authentication.getPrincipal()).getMember();
+        log.info("로그인 성공: {}", member.getEmail());
         String accessToken = jwtService.issueAccessToken(member);
         String refreshToken = jwtService.issueRefreshToken(member);
         JwtResponse body = new JwtResponse(accessToken, refreshToken);

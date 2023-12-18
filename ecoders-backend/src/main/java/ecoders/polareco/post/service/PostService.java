@@ -212,4 +212,6 @@ public class PostService {
         LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
         return ChronoUnit.SECONDS.between(now, midnight);
     }
+
 }
+

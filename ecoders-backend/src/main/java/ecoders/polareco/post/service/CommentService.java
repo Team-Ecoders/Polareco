@@ -32,7 +32,9 @@ public class CommentService {
     public void deleteComment(long commentId, String email) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(()->new BusinessLogicException(ExceptionCode.COMMENT_NOT_FOUND));
         verifyAuthor(comment, email);
+
         commentRepository.delete(comment);
+
     }
     private void verifyAuthor(Comment comment, String email) {
         String authorEmail = comment.getMember().getEmail();;
@@ -48,4 +50,6 @@ public class CommentService {
         }
         return member;
     }
+
 }
+

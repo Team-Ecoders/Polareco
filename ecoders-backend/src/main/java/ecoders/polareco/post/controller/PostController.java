@@ -79,17 +79,18 @@ public class PostController {
     public ResponseEntity<String> uploadImage(@RequestHeader("Content-Type") String contentType,
                                               @RequestParam("imageFile") MultipartFile imageFile){
         try{
-            String imageUrl = s3Service.uploadImage(imageFile, S3Service.ImageType.POST);
-            return ResponseEntity.ok(imageUrl);
-        } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Image upload failed");
+        String imageUrl = s3Service.uploadImage(imageFile, S3Service.ImageType.POST);
+        return ResponseEntity.ok(imageUrl);
+    } catch (Exception e){
+        e.printStackTrace();
+        return ResponseEntity.status(500).body("Image upload failed");
         }
     }
 
 
 
     @GetMapping("/{post-id}")
+
     public ResponseEntity<PostDto.PostResponseDtoV1> getPost(@PathVariable("post-id") long postId,
                                                              @AuthenticationPrincipal String email) {
         PostDto.PostResponseDtoV1 foundPost = postService.getPost(postId);
@@ -110,7 +111,9 @@ public class PostController {
 
     @PatchMapping("/{post-id}")
     public ResponseEntity patchPost(@PathVariable("post-id") @Positive long postId,
+
                                     @RequestBody PostDto.PostUpdateDto postDto,
+
                                     @AuthenticationPrincipal String email)
     {
         Post newPost = postService.updatePost(postId, email);
@@ -191,4 +194,6 @@ public class PostController {
 
 
 
+
 }
+

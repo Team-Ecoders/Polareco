@@ -1,7 +1,7 @@
 package ecoders.polareco.redis.service;
 
-import ecoders.polareco.error.exception.BusinessLogicException;
 import ecoders.polareco.error.exception.ExceptionCode;
+import ecoders.polareco.error.exception.BusinessLogicException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -52,6 +52,7 @@ public class RedisService {
         return (String) value;
     }
 
+
     public void savePasswordResetToken(String email, String token) {
         String key = keyForPasswordResetToken(email);
         redisTemplate.opsForValue().set(key, token, 30, TimeUnit.MINUTES);
@@ -81,15 +82,23 @@ public class RedisService {
         valueOperations.set(key, value, expireDuration);
     }
 
+
     private String keyForEmailVerification(String email) {
-        return "email-verification:" + email;
+        return "verification:email:" + email;
     }
 
     private String keyForRefreshToken(String email) {
-        return "refresh-token:" + email;
+        return "refreshtoken:" + email;
     }
 
-    private String keyForPasswordResetToken(String email) {
-        return "password-reset:" + email;
+    public String getData(String key) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        return valueOperations.get(key);
+    }
+
+    public void setDateExpire(String key, String value, long duration) {
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        Duration expireDuration = Duration.ofSeconds(duration);
+        valueOperations.set(key, value, expireDuration);
     }
 }
