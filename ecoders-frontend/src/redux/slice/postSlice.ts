@@ -21,9 +21,9 @@ export const postSlice = createSlice({
   name: 'post',
   initialState,
   reducers: {
-    setPost: (state, action) => {
-      state = action.payload;
-    },
+    // setPost: (state, action) => {
+    //   state = action.payload;
+    // },
     setMemberId: (state, action) => {
       state.memberId = action.payload;
     },
@@ -67,7 +67,7 @@ export const postSlice = createSlice({
 });
 
 export const {
-  setPost,
+  // setPost,
   setMemberId,
   setPostId,
   setTitle,
