@@ -126,7 +126,7 @@ function LoginPage() {
       try {
         const response = await axios.get(`${APIURL}/check/google`, {
           params: data,
-          headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
+          // headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
         });
         console.log(response);
         if (response.data.isGoogleMember) {
@@ -151,7 +151,7 @@ function LoginPage() {
       const response = await axios.get(`${APIURL}/oauth2/authentication/google`, {
         headers: {
           //ngrok 사용시에만 넣음
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          // 'ngrok-skip-browser-warning': 'skip-browser-warning',
         },
       });
       if (response.status === 200) {

@@ -285,7 +285,7 @@ function Signup() {
       const response = await axios.get(`${APIURL}/oauth2/authentication/google`, {
         headers: {
           //ngrok 사용시에만 넣음
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          // 'ngrok-skip-browser-warning': 'skip-browser-warning',
         },
       });
 

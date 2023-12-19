@@ -68,7 +68,7 @@ function Session() {
         headers: {
           Authorization: accessToken,
           //ngrok 사용시에만 넣음
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          // 'ngrok-skip-browser-warning': 'skip-browser-warning',
         },
       });
       // accessToken으로 유저 정보 불러오기 성공 (user 정보 저장)
