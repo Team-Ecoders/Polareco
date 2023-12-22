@@ -48,6 +48,7 @@ export async function tokenExpirationHandler(fun: Function) {
       //로그아웃
       // dispatch(logout());
       // setIsLoading(false);
+      window.location.reload();
     } else {
       console.log(err);
     }
@@ -77,8 +78,10 @@ function Session() {
         dispatch(setUsername(response.data.username));
         dispatch(setEmail(response.data.email));
         dispatch(setId(response.data.uuid));
-        dispatch(setProfileImg(response.data.profileImage));
-        //프로필 이미지
+        //이미지 있는 경우만 불러옴
+        if (response.data.profileImage) {
+          dispatch(setProfileImg(response.data.profileImage));
+        }
         console.log('User information has been received successfully.');
         dispatch(login());
       }
