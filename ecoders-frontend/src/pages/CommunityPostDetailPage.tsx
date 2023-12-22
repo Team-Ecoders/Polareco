@@ -118,7 +118,7 @@ function CommunityPostDetailPage() {
         headers: {
           Authorization: `${USERACCESSTOKEN}`,
           //ngrok 사용시에만 넣음
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          // 'ngrok-skip-browser-warning': 'skip-browser-warning',
         },
       })
       .then(function (response) {

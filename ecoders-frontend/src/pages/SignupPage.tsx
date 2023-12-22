@@ -9,7 +9,9 @@ import { useDispatch } from 'react-redux';
 import { closeModal, openModal } from '../redux/slice/modalSlice';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { login } from '../redux/slice/loginSlice';
+import { login, logout } from '../redux/slice/loginSlice';
+import { setEmail, setId, setProfileImg, setUsername } from '../redux/slice/userSlice';
+import { tokenExpirationHandler } from '../components/feature/user/Session';
 
 //vite로 만든 프로젝트에서 환경변수 사용하기
 const APIURL = import.meta.env.VITE_API_URL;
@@ -63,7 +65,43 @@ function Signup() {
   // 타이머 관련 상태
   const [timeLeft, setTimeLeft] = useState(180); // 초 단위로 시간을 저장
   const [isRunning, setIsRunning] = useState(false);
+  //로그인 성공한 회원 정보 불러오는 요청
+  async function getUser() {
+    const accessToken = localStorage.getItem('accessToken');
 
+    console.log(accessToken);
+    try {
+      // setIsLoading(true);
+      const response = await axios.get(`${APIURL}/member/my-info`, {
+        headers: {
+          Authorization: accessToken,
+          //ngrok 사용시에만 넣음
+          // 'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      });
+      // accessToken으로 유저 정보 불러오기 성공 (user 정보 저장)
+      if (response.status === 200) {
+        //get한 정보 userSlice 저장
+        dispatch(setUsername(response.data.username));
+        dispatch(setEmail(response.data.email));
+        dispatch(setId(response.data.uuid));
+        //이미지 있는 경우만 불러옴
+        if (response.data.profileImage) {
+          dispatch(setProfileImg(response.data.profileImage));
+        }
+        console.log('User information has been received successfully.');
+        dispatch(login());
+      }
+    } catch (err: any) {
+      //accessToken 만료일 경우
+      if (err.response.status === 403) {
+        console.log('session');
+        tokenExpirationHandler(getUser);
+      } else {
+        dispatch(logout());
+      }
+    }
+  }
   //이메일 인증 메일이 발송되면 유효 시간 카운트
   useEffect(() => {
     let timer: number;
@@ -186,6 +224,7 @@ function Signup() {
           headers: {
             'Content-Type': 'application/json',
           },
+          withCredentials: true,
         });
         if (response.status === 200) {
           //인증메일 발송 완료-> 완료 모달
@@ -219,7 +258,7 @@ function Signup() {
       try {
         const response = await axios.post(`${APIURL}/signup/code/verification`, data, {
           headers: {
-            'ngrok-skip-browser-warning': 'skip-browser-warning',
+            // 'ngrok-skip-browser-warning': 'skip-browser-warning',
           },
         });
 
@@ -279,36 +318,41 @@ function Signup() {
     }
   };
 
-  const googleLoginHandler = async (e: any) => {
-    e.preventDefault();
+  const googleLoginHandler = async () => {
+    // e.preventDefault();
     try {
-      const response = await axios.get(`${APIURL}/oauth2/authentication/google`, {
-        headers: {
-          //ngrok 사용시에만 넣음
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-        },
-      });
+      console.log(`${APIURL}/oauth2/authorization/google`);
+      window.location.href = `${APIURL}/oauth2/authorization/google`;
+    } catch (err: any) {
+      console.log('Google 로그인 중 에러:', err);
+    }
+  };
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const accessToken = urlSearchParams.get('accessToken');
+    const refreshToken = urlSearchParams.get('refreshToken');
 
-      if (response.status === 200) {
-        // 1. 로컬에 토큰 저장
-        const accessToken = response.data['accessToken'];
-        const refreshToken = response.data['refreshToken'];
-
+    console.log(accessToken);
+    console.log(refreshToken);
+    if (accessToken && refreshToken) {
+      try {
+        // 로컬 스토리지에 토큰 저장
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
 
-        // 2. 로그인 전역 상태 변경
+        // 로그인 성공 처리
         dispatch(login());
-
-        // 3. 홈(메인)으로 이동
+        //getuser
+        getUser();
+        // 로그인 성공 후 리다이렉션 처리
         navigate('/');
-      }
-    } catch (err: any) {
-      if (err.response.status === 401) {
-        console.log(err);
+      } catch (error) {
+        console.error('로그인 에러:', error);
+        // 로그인 에러 처리
+        navigate('/login');
       }
     }
-  };
+  }, [dispatch, navigate]);
 
   return (
     <Container>
@@ -482,7 +526,7 @@ function Signup() {
                     </div>
                   </div>
                 </SignUpModal>
-                <SubmitButtonGoogle className="google-login-submit" onClick={googleLoginHandler}>
+                <SubmitButtonGoogle className="google-login-submit" type="button" onClick={googleLoginHandler}>
                   <GoogleLogo src={googleicon} />
                   Sign up with google
                 </SubmitButtonGoogle>

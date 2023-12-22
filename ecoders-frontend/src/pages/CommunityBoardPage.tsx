@@ -51,7 +51,7 @@ function CommunityBoardPage() {
       .get(`${APIURL}/posts/all?lastPostId=${lastPostId}&size=${getPostCount}${searchKeyWord}`, {
         headers: {
           //ngrok 사용시에만 넣음
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          // 'ngrok-skip-browser-warning': 'skip-browser-warning',
         },
       })
       .then(function (response) {
