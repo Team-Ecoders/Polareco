@@ -2,7 +2,7 @@
 
 ## 🐻‍❄️북극곰 살리기 프로젝트(탄소 중립 실천 습관 형성)
 - [POLARECO](http://polareco-bucket.s3-website.ap-northeast-2.amazonaws.com/)
-- 프로젝트 기간: 2023.10.24 ~ 2023.09.22
+- 프로젝트 기간: 2023.10.24 ~ 2023.12.29
 
 <br>
 
